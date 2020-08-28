@@ -40,13 +40,12 @@ namespace RabbitLabirint
             gameObject.transform.position = tilemap.GetCellCenterWorld(Coordinate);
 
             IsMoving = false;
-            UIStep.Instance.SetValue(steps); // transfer to start level function
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && GameManager.Instance.topState.GetName() == "Game")
             {
                 IsMoving = true;
 

@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class UICarrot : MonoSingleton<UICarrot>
+namespace RabbitLabirint
 {
-    [SerializeField]
-    private TextMeshProUGUI textBlock;
-    [SerializeField]
-    private string textTitle;
-
-    public void SetValue(int value)
+    public class UICarrot : MonoSingleton<UICarrot>
     {
-        textBlock.text = textTitle + value;
+        [SerializeField]
+        private TextMeshProUGUI textBlock;
+        [SerializeField]
+        private string textTitle;
+
+        public void SetValue(int value)
+        {
+            textBlock.text = textTitle + value;
+        }
     }
 }

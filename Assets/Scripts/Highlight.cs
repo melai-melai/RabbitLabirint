@@ -46,7 +46,7 @@ public class Highlight : MonoSingleton<Highlight>
     // Update is called once per frame
     void Update()
     {
-        if (!PlayerController.Instance.IsMoving)
+        if (!PlayerController.Instance.IsMoving && GameManager.Instance.topState.GetName() == "Game")
         {
             DrawLine();
         }
