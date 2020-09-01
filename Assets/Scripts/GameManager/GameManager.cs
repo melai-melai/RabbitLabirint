@@ -62,6 +62,10 @@ namespace RabbitLabirint
         }
 
         #region State management
+        /// <summary>
+        /// Switch state on the state with name: newState
+        /// </summary>
+        /// <param name="newState">Name of the state</param>
         public void SwitchState(string newState)
         {
             State state = FindState(newState);
@@ -71,17 +75,18 @@ namespace RabbitLabirint
                 return;
             }
 
+            State oldState = stateStack[stateStack.Count - 1];
             stateStack[stateStack.Count - 1].Exit(state);
-            state.Enter(stateStack[stateStack.Count - 1]);
             stateStack.RemoveAt(stateStack.Count - 1);
             stateStack.Add(state);
+            state.Enter(oldState);
         }
 
         /// <summary>
         /// Finds the state in the dictionary
         /// </summary>
-        /// <param name="stateName"></param>
-        /// <returns></returns>
+        /// <param name="stateName">Name to search</param>
+        /// <returns>Found state</returns>
         public State FindState(string stateName)
         {
             State state;
@@ -92,7 +97,10 @@ namespace RabbitLabirint
 
             return state;
         }
-        
+
+        /// <summary>
+        /// Pop state from stack
+        /// </summary>
         public void PopState()
         {
             if (stateStack.Count < 2)
@@ -106,6 +114,10 @@ namespace RabbitLabirint
             stateStack.RemoveAt(stateStack.Count - 1);
         }
         
+        /// <summary>
+        /// Push state to stack
+        /// </summary>
+        /// <param name="name">Name of the state</param>
         public void PushState(string name)
         {
             State state;

@@ -14,5 +14,9 @@ namespace RabbitLabirint
         public abstract void Tick();
 
         public abstract string GetName();
+
+        public virtual void LoadSelectedLevel() { }
+        public virtual void Pause(bool displayMenu) { }
+        public virtual void Resume() { }
     }
 }

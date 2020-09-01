@@ -24,7 +24,8 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
         if (_instance != null && _instance != this)
         {
             Destroy(this.gameObject);
-        } else
+        } 
+        else
         {
             _instance = this as T;
 
@@ -36,5 +37,6 @@ public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T
     {
         // optional to override
     }
+
 
 }

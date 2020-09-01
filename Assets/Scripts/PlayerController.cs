@@ -8,7 +8,14 @@ namespace RabbitLabirint
     public class PlayerController : MonoSingleton<PlayerController>
     {
         public float speed = 5f;
-        public int steps = 5;
+        private int maxSteps = 5;
+
+        //private Vector2 position;
+        private Vector2 target;
+        private Camera cam;
+        private int currentPoints;
+        //private Tilemap tilemap;
+        private Highlight highlightMap;
 
         public Vector3Int Coordinate
         {
@@ -18,28 +25,24 @@ namespace RabbitLabirint
             }
         }
 
-        public bool IsMoving { get; private set; }
+        public int Steps { get; private set; }
 
-        private Vector2 position;
-        private Vector2 target;
-        private Camera cam;
-        private int currentPoints;
-        private Tilemap tilemap;        
+        public bool IsMoving { get; private set; }
+        public bool IsFinished { get; private set; }
+
 
         // Start is called before the first frame update
         void Start()
         {
-            position = gameObject.transform.position;
-            target = position;
-
             cam = Camera.main;
 
-            currentPoints = 0;
+            target = gameObject.transform.position;          
 
-            tilemap = GameObject.Find("Tilemap").GetComponent<Tilemap>();
-            gameObject.transform.position = tilemap.GetCellCenterWorld(Coordinate);
+            currentPoints = 0;
+            Steps = maxSteps;
 
             IsMoving = false;
+            IsFinished = false;
         }
 
         // Update is called once per frame
@@ -49,7 +52,14 @@ namespace RabbitLabirint
             {
                 IsMoving = true;
 
-                Vector3 targetWorldPos = Highlight.Instance.Target;
+                if (highlightMap == null)
+                {
+                    highlightMap = GameObject.FindGameObjectWithTag("HighlightTilemap").GetComponent<Highlight>();
+                    Debug.Log("highlight reinit");
+                }
+
+                Vector3 targetWorldPos = highlightMap.Target;
+                Tilemap tilemap = GameObject.FindGameObjectWithTag("Tilemap").GetComponentInChildren<Tilemap>();
                 target = tilemap.GetCellCenterWorld(Vector3Int.FloorToInt(targetWorldPos));
             }
         }
@@ -105,11 +115,39 @@ namespace RabbitLabirint
             }            
         }
 
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.gameObject.name == "RabbitHole")
+            {
+                IsFinished = true;
+            }
+        }
+
         void FinishMoving()
         {
             IsMoving = false;
-            steps -= 1;
-            UIStep.Instance.SetValue(steps);
+            Steps -= 1;
+            UIStep.Instance.SetValue(Steps);
+        }
+
+        /// <summary>
+        /// Prepare the player for the level
+        /// </summary>
+        public void PreparePlayerForLevel()
+        {
+            Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
+            Transform playerStartPosition = GameObject.FindGameObjectWithTag("PlayerStartPosition").GetComponent<Transform>();
+            highlightMap = GameObject.FindGameObjectWithTag("HighlightTilemap").GetComponent<Highlight>();
+            Vector3Int cellPosition = grid.LocalToCell(playerStartPosition.position);
+            transform.localPosition = grid.GetCellCenterWorld(cellPosition);
+
+            target = transform.localPosition;
+
+            currentPoints = 0;
+            Steps = maxSteps;
+
+            IsMoving = false;
+            IsFinished = false;
         }
     }
 

@@ -8,8 +8,8 @@ using UnityEngine.UI;
 namespace RabbitLabirint
 {
     /// <summary>
-    /// Pushed on top of the GameManager during gameplay. Takes care of initializing all the UI and start the TrackManager
-    /// Also will take care of cleaning when leaving that state.
+    /// Pushed on top of the GameManager during gameplay. Takes care of initializing all the UI.
+    /// Also will take care of cleaning when leaving that state
     /// </summary>
     public class GameState : State
     {
@@ -26,46 +26,61 @@ namespace RabbitLabirint
         public RectTransform wholeUI;
         public RectTransform pauseMenu;
         public Button pauseButton;
+        public RectTransform totalInfoPopup;
 
         protected bool isFinished;
 
-
-
+        #region State
+        /// <summary>
+        /// Enter the state
+        /// </summary>
+        /// <param name="from">Previous state</param>
         public override void Enter(State from)
         {
             StartGame();
         }
 
-        private void StartGame()
-        {
-            canvas.gameObject.SetActive(true);
-            pauseMenu.gameObject.SetActive(false);
-            wholeUI.gameObject.SetActive(true);
-            pauseButton.gameObject.SetActive(true);
-
-            isFinished = false;
-
-            UIStep.Instance.SetValue(PlayerController.Instance.steps);
-            UICarrot.Instance.SetValue(0);
-        }
-
+        /// <summary>
+        /// Exit from the state
+        /// </summary>
+        /// <param name="to">Next state</param>
         public override void Exit(State to)
         {
             canvas.gameObject.SetActive(false);
+            pauseMenu.gameObject.SetActive(false);
+            totalInfoPopup.gameObject.SetActive(false);
+            wholeUI.gameObject.SetActive(false);
+            pauseButton.gameObject.SetActive(false);
+
+            LevelManager.Instance.ToggleLevelSelectPopup(false);
+            LevelManager.Instance.DeleteLevel();
 
             // clear all collected points and steps
         }
 
+        /// <summary>
+        /// Get name of the state
+        /// </summary>
+        /// <returns>string name</returns>
         public override string GetName()
         {
             return "Game";
         }
 
+        /// <summary>
+        /// Execute every frame (in update function of game manager)
+        /// </summary>
         public override void Tick()
         {
-            
+            if (PlayerController.Instance.IsFinished)
+            {
+                //    StartCoroutine("WaitForLevelGameOver");
+                OpenTotalInfoPopup();
+            }
         }
+        #endregion
 
+        #region Unity methods
         private void OnApplicationPause(bool pause)
         {
             if (pause) Pause();
@@ -75,8 +90,30 @@ namespace RabbitLabirint
         {
             if (!focus) Pause();
         }
+        #endregion
 
-        public void Pause(bool displayMenu = true)
+        /// <summary>
+        /// Prepare game for playing
+        /// </summary>
+        private void StartGame()
+        {
+            canvas.gameObject.SetActive(true);
+            pauseMenu.gameObject.SetActive(false);
+            totalInfoPopup.gameObject.SetActive(false);
+            wholeUI.gameObject.SetActive(true);
+            pauseButton.gameObject.SetActive(true);
+
+            isFinished = false;
+
+            // load current level or selected level
+            LevelManager.Instance.LoadLevel();
+        }
+
+        /// <summary>
+        /// Pause the game
+        /// </summary>
+        /// <param name="displayMenu"></param>
+        public override void Pause(bool displayMenu = true)
         {
             //check if we aren't finished OR if we aren't already in pause (as that would mess states)
             if (isFinished || AudioListener.pause == true)
@@ -92,7 +129,10 @@ namespace RabbitLabirint
             wholeUI.gameObject.SetActive(false);
         }
 
-        public void Resume()
+        /// <summary>
+        /// Resume the game
+        /// </summary>
+        public override void Resume()
         {
             Time.timeScale = 1.0f;
 
@@ -115,18 +155,54 @@ namespace RabbitLabirint
             gameManager.SwitchState("Loadout");
         }
 
-        IEnumerator WaitForGameOver()
-        {
-            isFinished = true;
+        //IEnumerator WaitForLevelGameOver()
+        //{
+        //    isFinished = true;
+        //    yield return null;
+            // count level points (example 2 from 3 stars)
+        //    OpenTotalInfoPopup();
+        //}
 
-            yield return new WaitForSeconds(2.0f);
-
-            gameManager.SwitchState("GameOver");
-        }
-
+        /// <summary>
+        /// Game over with changing state
+        /// </summary>
         public void GameOver()
         {
             gameManager.SwitchState("GameOver");
+        }
+
+        /// <summary>
+        /// Open popup with level results
+        /// </summary>
+        private void OpenTotalInfoPopup()
+        {
+            totalInfoPopup.gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Load selected level (example: select from game state)
+        /// </summary>
+        public override void LoadSelectedLevel()
+        {
+            StartGame();
+        }
+
+        /// <summary>
+        /// Repeat level
+        /// </summary>
+        public void RepeatLevel()
+        {
+            LevelManager.Instance.RepeatLevel();
+            totalInfoPopup.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Load next level
+        /// </summary>
+        public void GoNextLevel()
+        {
+            LevelManager.Instance.LoadNextLevel();
+            totalInfoPopup.gameObject.SetActive(false);
         }
     }
 }
