@@ -7,15 +7,13 @@ namespace RabbitLabirint
 {
     public class CarrotCollectible : MonoBehaviour
     {
-        private int point = 1;
+        private readonly int point = 1;
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            PlayerController player = other.GetComponent<PlayerController>();
-
-            if (player != null)
+            if (other.gameObject.CompareTag("Player"))
             {
-                player.ChangePoints(point);
+                PlayerController.Instance.ChangePoints(point);
                 Destroy(gameObject);
             }
         }

@@ -9,6 +9,9 @@ namespace RabbitLabirint
     {
         public float speed = 5f;
         private int maxSteps = 5;
+        [SerializeField]
+        private GameObject playerPrefab;
+        private GameObject currentPlayerGO;
 
         //private Vector2 position;
         private Vector2 target;
@@ -95,7 +98,7 @@ namespace RabbitLabirint
 
         void Move()
         {
-            if (IsMoving)
+            if (IsMoving && GameManager.Instance.topState.GetName() == "Game")
             {
                 // move sprite towards the target location
                 transform.position = Vector2.MoveTowards(transform.position, target, speed * Time.deltaTime);
@@ -140,6 +143,7 @@ namespace RabbitLabirint
             highlightMap = GameObject.FindGameObjectWithTag("HighlightTilemap").GetComponent<Highlight>();
             Vector3Int cellPosition = grid.LocalToCell(playerStartPosition.position);
             transform.localPosition = grid.GetCellCenterWorld(cellPosition);
+            Destroy(playerStartPosition.gameObject);
 
             target = transform.localPosition;
 
@@ -148,6 +152,18 @@ namespace RabbitLabirint
 
             IsMoving = false;
             IsFinished = false;
+
+            ResetPlayer();
+            currentPlayerGO = Instantiate(playerPrefab, gameObject.transform, false) as GameObject;
+        }
+
+        public void ResetPlayer()
+        {
+            if (currentPlayerGO != null)
+            {
+                Destroy(currentPlayerGO);
+                Debug.Log("Reset player " + currentPlayerGO.ToString());
+            }            
         }
     }
 

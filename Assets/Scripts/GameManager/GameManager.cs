@@ -29,6 +29,8 @@ namespace RabbitLabirint
         {
             base.Init();
 
+            
+
             audioSource = GetComponent<AudioSource>();
             //PlayNewBackgroundMusic(menuClip);
 
@@ -49,6 +51,11 @@ namespace RabbitLabirint
             stateStack.Clear();
 
             PushState(states[0].GetName());
+        }
+
+        private void OnEnable()
+        {
+            PlayerData.Create();
         }
 
         private void Update()

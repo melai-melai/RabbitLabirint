@@ -55,6 +55,8 @@ namespace RabbitLabirint
             LevelManager.Instance.ToggleLevelSelectPopup(false);
             LevelManager.Instance.DeleteLevel();
 
+            PlayerController.Instance.ResetPlayer();
+
             // clear all collected points and steps
         }
 
@@ -151,6 +153,7 @@ namespace RabbitLabirint
         {
             Time.timeScale = 1.0f;
             AudioListener.pause = false;
+            PlayerData.Instance.Save();
 
             gameManager.SwitchState("Loadout");
         }

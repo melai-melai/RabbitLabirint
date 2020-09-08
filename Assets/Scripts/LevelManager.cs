@@ -25,10 +25,30 @@ namespace RabbitLabirint
         public List<Level> levelList = new List<Level>();
 
         private Level currentLevel;
+        [SerializeField]
+        private string defaultLevelName;
+
+        public string CurLevelName
+        {
+            get
+            {
+                return currentLevel.levelName;
+            }
+        }
+
+        public string DefaultLevelName
+        {
+            get
+            {
+                return defaultLevelName;
+            }
+        }
 
         private void Start()
         {
-            currentLevel = levelList[levelList.Count - 1]; // TODO: get current level from player data
+            string savedCurrentLevelName = PlayerData.Instance.currentLevel;
+            Debug.Log("Saved current level name: " + savedCurrentLevelName);
+            currentLevel = FindLevelByName(savedCurrentLevelName);
 
             FillList();
         }
@@ -59,6 +79,14 @@ namespace RabbitLabirint
             }
 
             DeleteLevel();
+
+            if (currentLevel == null)
+            {
+                Debug.Log("The current level cannot be loaded");
+                GameManager.Instance.SwitchState("Loadout");
+                return;
+            }
+
             Instantiate(currentLevel.levelPrefab);
             PlayerController.Instance.PreparePlayerForLevel();
             UIStep.Instance.SetValue(PlayerController.Instance.Steps);
@@ -68,8 +96,11 @@ namespace RabbitLabirint
             {
                 GameManager.Instance.topState.LoadSelectedLevel();
             }
-            
+
             ToggleLevelSelectPopup(false);
+
+            PlayerData.Instance.currentLevel = currentLevel.levelName;
+            PlayerData.Instance.Save();
         }
 
         /// <summary>
@@ -90,7 +121,7 @@ namespace RabbitLabirint
             //        GameManager.Instance.topState.Resume();
             //    }
             //}
-            
+
         }
 
         /// <summary>
@@ -124,15 +155,60 @@ namespace RabbitLabirint
         public void LoadNextLevel()
         {
             //Level nextLevel = levelList.Find(item => item.levelName == currentLevel.levelName)
+            Level nextLevel = FindNextLevel();
+            if (nextLevel == null)
+            {
+                Debug.Log("The last level was finished! There is not a new next level. Go to Loadout state!");
+                GameManager.Instance.SwitchState("Loadout"); 
+            }
+            else
+            {
+                LoadLevel(nextLevel);
+            }            
+        }
+
+        /// <summary>
+        /// Searches for a level by name
+        /// </summary>
+        /// <param name="levelName">The name of the level to find</param>
+        /// <returns></returns>
+        private Level FindLevelByName(string levelName)
+        {
+            if (levelName == "" || levelName == null)
+            {
+                return null;
+            }
+
+            //foreach (var lvl in levelList)
+            //{
+            //    if (lvl.levelName == levelName)
+            //    {
+            //        return lvl;
+            //    }
+            //}
+
+            //return null;
+
+            Level level = levelList.Find(item => item.levelName == levelName);
+            return level;
+        }
+
+        /// <summary>
+        /// Searches for the next level after the current one
+        /// </summary>
+        /// <returns></returns>
+        private Level FindNextLevel()
+        {
             int currentLevelIndex = levelList.IndexOf(currentLevel);
             if (currentLevelIndex == (levelList.Count - 1)) // reach the last level
             {
-                LoadLevel(levelList[0]);
-            } else
+                return null;
+            }
+            else
             {
                 Level nextLevel = levelList[currentLevelIndex + 1];
-                LoadLevel(nextLevel);
-            }            
+                return nextLevel;
+            }
         }
     }
 }
