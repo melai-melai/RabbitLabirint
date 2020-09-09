@@ -24,9 +24,19 @@ namespace RabbitLabirint
 
         [SerializeField]
         private Slider volumeSlider;
+        [SerializeField]
+        private Slider volumeMusicSlider;
+        [SerializeField]
+        private Slider volumeSFXSlider;
         private const float minVolume = -80f;
         private const string volumeParamName = "Volume";
+        private const string volumeMusicParamName = "VolumeMusic";
+        private const string volumeSFXParamName = "VolumeSoundEffect";
         private float volume;
+        private float volumeMusic;
+        private float volumeSFX;
+
+        private float maxValueVolumeSlider = 1.0f;
 
         private void Start()
         {
@@ -83,6 +93,7 @@ namespace RabbitLabirint
 
         public void Close()
         {
+            PlayerData.Instance.Save();
             gameObject.SetActive(false);
         }
 
@@ -92,7 +103,12 @@ namespace RabbitLabirint
             SetListForResolutionDropdown();
 
             audioMixer.GetFloat(volumeParamName, out volume);
-            volumeSlider.value = 1.0f - (volume / minVolume);
+            audioMixer.GetFloat(volumeMusicParamName, out volumeMusic);
+            audioMixer.GetFloat(volumeSFXParamName, out volumeSFX);
+
+            volumeSlider.value = maxValueVolumeSlider - (volume / minVolume);
+            volumeMusicSlider.value = maxValueVolumeSlider - (volumeMusic / minVolume);
+            volumeSFXSlider.value = maxValueVolumeSlider - (volumeSFX / minVolume);
 
             fullScreenToggle.enabled = Screen.fullScreen;
         }
@@ -100,11 +116,34 @@ namespace RabbitLabirint
         /// <summary>
         /// Set master volume
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="value">Received value from the slider</param>
         public void SetVolume(float value)
         {
-            volume = minVolume * (1.0f - value);
+            volume = minVolume * (maxValueVolumeSlider - value);
             audioMixer.SetFloat(volumeParamName, volume);
+            PlayerData.Instance.masterVolume = volume;
+        }
+
+        /// <summary>
+        /// Set music volume
+        /// </summary>
+        /// <param name="value">Received value from the slider</param>
+        public void SetMusicVolume(float value)
+        {
+            volumeMusic = minVolume * (maxValueVolumeSlider - value);
+            audioMixer.SetFloat(volumeMusicParamName, volumeMusic);
+            PlayerData.Instance.musicVolume = volumeMusic;
+        }
+
+        /// <summary>
+        /// Set sound effect volume
+        /// </summary>
+        /// <param name="value">Received value from the slider</param>
+        public void SetSFXVolume(float value)
+        {
+            volumeSFX = minVolume * (maxValueVolumeSlider - value);
+            audioMixer.SetFloat(volumeSFXParamName, volumeSFX);
+            PlayerData.Instance.masterSFXVolume = volumeSFX;
         }
 
         /// <summary>
@@ -115,6 +154,8 @@ namespace RabbitLabirint
         {
             Resolution resolution = resolutions[resolutionIndex];
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+            PlayerData.Instance.resolutionWidth = resolution.width;
+            PlayerData.Instance.resolutionHeight = resolution.height;
         }
 
         /// <summary>
@@ -123,7 +164,9 @@ namespace RabbitLabirint
         /// <param name="qualityIndex"></param>
         public void SetQuality(int qualityIndex)
         {
-            QualitySettings.SetQualityLevel(qualityIndex + 1);
+            int qualityLevel = qualityIndex + 1;
+            QualitySettings.SetQualityLevel(qualityLevel);
+            PlayerData.Instance.qualityLevel = qualityLevel;
         }
 
         /// <summary>
@@ -133,6 +176,7 @@ namespace RabbitLabirint
         public void SetFullScreen(bool isFullScreen)
         {
             Screen.fullScreen = isFullScreen;
+            PlayerData.Instance.isFullScreen = isFullScreen;
         }
     }
 }

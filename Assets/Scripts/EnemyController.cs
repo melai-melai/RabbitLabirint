@@ -10,6 +10,7 @@ public class EnemyController : MonoBehaviour
         if (collision.tag == "Player")
         {
             Debug.Log("You are died!");
+            GameManager.Instance.SwitchState("GameOver");
         }
     }
 }

@@ -62,9 +62,12 @@ namespace RabbitLabirint
             gameManager.SwitchState("Loadout");
         }
 
-        //public void PlayAgain()
-        //{
-        //    gameManager.SwitchState("Game"); // TODO: start current level again
-        //}
+        /// <summary>
+        /// Play again current level
+        /// </summary>
+        public void PlayAgain()
+        {
+            gameManager.SwitchState("Game");
+        }
     }
 }

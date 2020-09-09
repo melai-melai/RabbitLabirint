@@ -110,17 +110,18 @@ namespace RabbitLabirint
         public void ToggleLevelSelectPopup(bool isHidden)
         {
             canvas.gameObject.SetActive(isHidden);
-            //if (GameManager.Instance.topState.GetName() == "Game")
-            //{
-            //    if (canvas.gameObject.activeSelf)
-            //    {
-            //        GameManager.Instance.topState.Pause(false);
-            //    }
-            //    else
-            //    {
-            //        GameManager.Instance.topState.Resume();
-            //    }
-            //}
+
+            if (GameManager.Instance.topState.GetName() == "Game")
+            {
+                if (canvas.gameObject.activeSelf)
+                {
+                    GameManager.Instance.topState.Pause(false);
+                }
+                else
+                {
+                    GameManager.Instance.topState.Resume();
+                }
+            }
 
         }
 
@@ -178,16 +179,6 @@ namespace RabbitLabirint
             {
                 return null;
             }
-
-            //foreach (var lvl in levelList)
-            //{
-            //    if (lvl.levelName == levelName)
-            //    {
-            //        return lvl;
-            //    }
-            //}
-
-            //return null;
 
             Level level = levelList.Find(item => item.levelName == levelName);
             return level;
