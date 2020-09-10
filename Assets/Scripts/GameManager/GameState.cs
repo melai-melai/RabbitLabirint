@@ -74,7 +74,7 @@ namespace RabbitLabirint
         /// </summary>
         public override void Tick()
         {
-            if (PlayerController.Instance.IsFinished)
+            if (PlayerController.Instance.IsFinished) // TODO: change on the event
             {
                 //    StartCoroutine("WaitForLevelGameOver");
                 OpenTotalInfoPopup();

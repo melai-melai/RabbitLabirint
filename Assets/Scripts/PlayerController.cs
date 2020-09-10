@@ -18,13 +18,14 @@ namespace RabbitLabirint
         private Camera cam;
         private int currentPoints;
         //private Tilemap tilemap;
-        private Highlight highlightMap;
+        //private Highlight highlightMap;
+        private RouteBuilder routeBuilder;
 
-        public Vector3Int Coordinate
+        public Vector3 Coordinate
         {
             get
             {
-                return Vector3Int.FloorToInt(gameObject.transform.position);
+                return gameObject.transform.position;
             }
         }
 
@@ -55,13 +56,13 @@ namespace RabbitLabirint
             {
                 IsMoving = true;
 
-                if (highlightMap == null)
+                /*if (highlightMap == null)
                 {
-                    highlightMap = GameObject.FindGameObjectWithTag("HighlightTilemap").GetComponent<Highlight>();
+                    highlightMap = GameObject.FindGameObjectWithTag("Tilemap").GetComponent<Highlight>();
                     Debug.Log("highlight reinit");
-                }
+                }*/
 
-                Vector3 targetWorldPos = highlightMap.Target;
+                Vector3 targetWorldPos = routeBuilder.Target;
                 Tilemap tilemap = GameObject.FindGameObjectWithTag("Tilemap").GetComponentInChildren<Tilemap>();
                 target = tilemap.GetCellCenterWorld(Vector3Int.FloorToInt(targetWorldPos));
             }
@@ -129,8 +130,13 @@ namespace RabbitLabirint
         void FinishMoving()
         {
             IsMoving = false;
-            Steps -= 1;
+            Steps = Mathf.Clamp(Steps - 1, 0, maxSteps);
             UIStep.Instance.SetValue(Steps);
+
+            if (Steps == 0)
+            {
+                IsFinished = true;
+            }
         }
 
         /// <summary>
@@ -140,7 +146,9 @@ namespace RabbitLabirint
         {
             Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
             Transform playerStartPosition = GameObject.FindGameObjectWithTag("PlayerStartPosition").GetComponent<Transform>();
-            highlightMap = GameObject.FindGameObjectWithTag("HighlightTilemap").GetComponent<Highlight>();
+            //highlightMap = GameObject.FindGameObjectWithTag("Tilemap").GetComponent<Highlight>();
+            routeBuilder = GameObject.FindGameObjectWithTag("Tilemap").GetComponent<RouteBuilder>();
+
             Vector3Int cellPosition = grid.LocalToCell(playerStartPosition.position);
             transform.localPosition = grid.GetCellCenterWorld(cellPosition);
             Destroy(playerStartPosition.gameObject);
