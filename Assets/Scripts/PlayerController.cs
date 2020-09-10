@@ -13,12 +13,9 @@ namespace RabbitLabirint
         private GameObject playerPrefab;
         private GameObject currentPlayerGO;
 
-        //private Vector2 position;
         private Vector2 target;
         private Camera cam;
         private int currentPoints;
-        //private Tilemap tilemap;
-        //private Highlight highlightMap;
         private RouteBuilder routeBuilder;
 
         public Vector3 Coordinate
@@ -54,17 +51,16 @@ namespace RabbitLabirint
         {
             if (Input.GetMouseButtonDown(0) && GameManager.Instance.topState.GetName() == "Game")
             {
-                IsMoving = true;
-
-                /*if (highlightMap == null)
+                if (routeBuilder == GameObject.FindGameObjectWithTag("Level").GetComponent<LevelProvider>().RouteBuilder)
                 {
-                    highlightMap = GameObject.FindGameObjectWithTag("Tilemap").GetComponent<Highlight>();
-                    Debug.Log("highlight reinit");
-                }*/
+                    Debug.Log("route builder equals!!!!");
+                }
+                routeBuilder.DrawTarget();
+                target = routeBuilder.Target;
 
-                Vector3 targetWorldPos = routeBuilder.Target;
-                Tilemap tilemap = GameObject.FindGameObjectWithTag("Tilemap").GetComponentInChildren<Tilemap>();
-                target = tilemap.GetCellCenterWorld(Vector3Int.FloorToInt(targetWorldPos));
+                IsMoving = true;
+                //Tilemap tilemap = GameObject.FindGameObjectWithTag("Tilemap").GetComponentInChildren<Tilemap>();
+                //tilemap.GetCellCenterWorld(Vector3Int.FloorToInt(targetWorldPos));
             }
         }
 
@@ -142,16 +138,19 @@ namespace RabbitLabirint
         /// <summary>
         /// Prepare the player for the level
         /// </summary>
-        public void PreparePlayerForLevel()
+        public void PreparePlayerForLevel(LevelProvider lvl)
         {
-            Grid grid = GameObject.FindGameObjectWithTag("Grid").GetComponent<Grid>();
-            Transform playerStartPosition = GameObject.FindGameObjectWithTag("PlayerStartPosition").GetComponent<Transform>();
-            //highlightMap = GameObject.FindGameObjectWithTag("Tilemap").GetComponent<Highlight>();
-            routeBuilder = GameObject.FindGameObjectWithTag("Tilemap").GetComponent<RouteBuilder>();
+            if (lvl == null)
+            {
+                Debug.Log("Level is not available!");
+                GameManager.Instance.SwitchState("Loadout");
+                return;
+            }
 
-            Vector3Int cellPosition = grid.LocalToCell(playerStartPosition.position);
-            transform.localPosition = grid.GetCellCenterWorld(cellPosition);
-            Destroy(playerStartPosition.gameObject);
+            //Vector3Int cellPosition = lvl.Grid.LocalToCell(lvl.PlayerStartPosition.position);
+            //transform.localPosition = lvl.Grid.GetCellCenterWorld(cellPosition);
+            transform.position = lvl.PlayerStartPosition.position;
+            //Destroy(lvl.PlayerStartPosition.gameObject);
 
             target = transform.localPosition;
 
@@ -161,10 +160,17 @@ namespace RabbitLabirint
             IsMoving = false;
             IsFinished = false;
 
+            routeBuilder = lvl.RouteBuilder;
+            Debug.Log("route builder");
+            Debug.Log(routeBuilder);
+
             ResetPlayer();
             currentPlayerGO = Instantiate(playerPrefab, gameObject.transform, false) as GameObject;
         }
 
+        /// <summary>
+        /// Reset player (reset attached game object and etc.)
+        /// </summary>
         public void ResetPlayer()
         {
             if (currentPlayerGO != null)
@@ -173,6 +179,7 @@ namespace RabbitLabirint
                 Debug.Log("Reset player " + currentPlayerGO.ToString());
             }            
         }
+
     }
 
 }

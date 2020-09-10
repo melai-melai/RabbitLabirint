@@ -9,7 +9,6 @@ namespace RabbitLabirint
     public class RouteBuilder : MonoBehaviour
     {
         [SerializeField]
-        //private TileBase TargetTile;
         private GameObject target;
         private Tilemap tilemap;
         private Vector3 targetCoordinate;
@@ -20,7 +19,7 @@ namespace RabbitLabirint
         {
             get
             {
-                return (Vector3)targetCoordinate;
+                return GetCoordinateTarget();
             }
         }
 
@@ -32,23 +31,20 @@ namespace RabbitLabirint
 
         private void Update()
         {
-            if (PlayerController.Instance != null && tilemap != null) // TODO: update code
-            {
-                if (!PlayerController.Instance.IsFinished && !PlayerController.Instance.IsMoving && GameManager.Instance.topState.GetName() == "Game")
-                {
-                    DrawTarget();
-                }
-            }
+           
         }
 
         /// <summary>
         /// Draw target
         /// </summary>
-        void DrawTarget()
+        public void DrawTarget()
         {
-            targetCoordinate = GetCoordinateTarget();
-
-            target.transform.position = new Vector3(targetCoordinate.x, targetCoordinate.y, 0);
+            if (target == null)
+            {
+                Debug.Log("target is null");
+                return;
+            }
+            target.transform.position = new Vector3(Target.x, Target.y, 0);
 
             target.gameObject.SetActive(true);
         }

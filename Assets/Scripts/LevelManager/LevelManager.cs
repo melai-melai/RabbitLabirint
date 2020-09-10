@@ -87,8 +87,8 @@ namespace RabbitLabirint
                 return;
             }
 
-            Instantiate(currentLevel.levelPrefab);
-            PlayerController.Instance.PreparePlayerForLevel();
+            LevelProvider newLevelProvider = CreateLevel();
+            PlayerController.Instance.PreparePlayerForLevel(newLevelProvider);
             UIStep.Instance.SetValue(PlayerController.Instance.Steps);
             UICarrot.Instance.SetValue(0);
 
@@ -125,6 +125,19 @@ namespace RabbitLabirint
 
         }
 
+
+        /// <summary>
+        /// Create new level
+        /// </summary>
+        /// <returns>LevelProvider contains data about level</returns>
+        private LevelProvider CreateLevel()
+        {
+            GameObject newLevelGO = Instantiate(currentLevel.levelPrefab);
+            LevelProvider newLevelProvider = newLevelGO.GetComponent<LevelProvider>();
+
+            return newLevelProvider;
+        }
+
         /// <summary>
         /// Delete level from scene
         /// </summary>
@@ -144,8 +157,11 @@ namespace RabbitLabirint
         public void RepeatLevel()
         {
             DeleteLevel();
-            Instantiate(currentLevel.levelPrefab);
-            PlayerController.Instance.PreparePlayerForLevel();
+
+            LevelProvider newLevelProvider = CreateLevel();
+
+            PlayerController.Instance.PreparePlayerForLevel(newLevelProvider);
+
             UIStep.Instance.SetValue(PlayerController.Instance.Steps);
             UICarrot.Instance.SetValue(0);
         }
