@@ -17,6 +17,8 @@ namespace RabbitLabirint
         private Camera cam;
         private int currentPoints;
         private RouteBuilder routeBuilder;
+        private Grid grid;
+        private Tilemap tilemap;
 
         public Vector3 Coordinate
         {
@@ -160,12 +162,15 @@ namespace RabbitLabirint
             IsMoving = false;
             IsFinished = false;
 
+            grid = lvl.Grid;
+            tilemap = lvl.Tilemap;
             routeBuilder = lvl.RouteBuilder;
-            Debug.Log("route builder");
-            Debug.Log(routeBuilder);
 
             ResetPlayer();
             currentPlayerGO = Instantiate(playerPrefab, gameObject.transform, false) as GameObject;
+
+
+            //GetRoadTile();
         }
 
         /// <summary>
@@ -180,6 +185,20 @@ namespace RabbitLabirint
             }            
         }
 
+        /*private RoadTile GetRoadTile()
+        {
+            Vector3Int coord = grid.WorldToCell(transform.position);
+            Debug.Log(coord);
+
+            RoadTile rt = tilemap.GetTile<RoadTile>(coord);
+
+            //Debug.Log(rt.Top);
+            //Debug.Log(rt.Right);
+            //Debug.Log(rt.Bottom);
+            //Debug.Log(rt.Left);
+
+            return rt;
+        }*/
     }
 
 }

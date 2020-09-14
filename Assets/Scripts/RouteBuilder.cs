@@ -13,8 +13,6 @@ namespace RabbitLabirint
         private Tilemap tilemap;
         private Vector3 targetCoordinate;
 
-
-
         public Vector3 Target
         {
             get

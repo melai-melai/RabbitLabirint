@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace RabbitLabirint
 {
@@ -10,6 +11,8 @@ namespace RabbitLabirint
         private Grid grid;
         [SerializeField]
         private Transform playerStartPosition;
+        [SerializeField]
+        private Tilemap tilemap;
         [SerializeField]
         private RouteBuilder routeBuilder;
 
@@ -26,6 +29,14 @@ namespace RabbitLabirint
             get
             {
                 return playerStartPosition;
+            }
+        }
+
+        public Tilemap Tilemap
+        {
+            get
+            {
+                return tilemap;
             }
         }
 
