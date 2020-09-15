@@ -89,8 +89,6 @@ namespace RabbitLabirint
 
             LevelProvider newLevelProvider = CreateLevel();
             PlayerController.Instance.PreparePlayerForLevel(newLevelProvider);
-            UIStep.Instance.SetValue(PlayerController.Instance.Steps);
-            UICarrot.Instance.SetValue(0);
 
             if (GameManager.Instance.topState.GetName() == "Loadout")
             {

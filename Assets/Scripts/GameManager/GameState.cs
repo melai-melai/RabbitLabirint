@@ -109,6 +109,9 @@ namespace RabbitLabirint
 
             // load current level or selected level
             LevelManager.Instance.LoadLevel();
+
+            UIStep.Instance.SetValue(PlayerController.Instance.Steps);
+            UICarrot.Instance.SetValue(0);
         }
 
         /// <summary>

@@ -39,7 +39,7 @@ namespace RabbitLabirint
         {
             cam = Camera.main;
 
-            target = gameObject.transform.position;          
+            target = gameObject.transform.position;
 
             currentPoints = 0;
             Steps = maxSteps;
@@ -51,15 +51,22 @@ namespace RabbitLabirint
         // Update is called once per frame
         void Update()
         {
+            if (Input.GetMouseButtonDown(1) && GameManager.Instance.topState.GetName() == "Game")
+            {
+                DrawWays();
+            }
+
             if (Input.GetMouseButtonDown(0) && GameManager.Instance.topState.GetName() == "Game")
             {
-                if (routeBuilder == GameObject.FindGameObjectWithTag("Level").GetComponent<LevelProvider>().RouteBuilder)
+
+                /*if (routeBuilder == GameObject.FindGameObjectWithTag("Level").GetComponent<LevelProvider>().RouteBuilder)
                 {
                     Debug.Log("route builder equals!!!!");
                 }
                 routeBuilder.DrawTarget();
-                target = routeBuilder.Target;
+                */
 
+                target = routeBuilder.Target;
                 IsMoving = true;
                 //Tilemap tilemap = GameObject.FindGameObjectWithTag("Tilemap").GetComponentInChildren<Tilemap>();
                 //tilemap.GetCellCenterWorld(Vector3Int.FloorToInt(targetWorldPos));
@@ -106,16 +113,15 @@ namespace RabbitLabirint
                     FinishMoving();
                 }
             }
-            
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
+        /*private void OnCollisionEnter2D(Collision2D collision)
         {
             if (collision.gameObject.name == "Tilemap")
             {
                 FinishMoving();
-            }            
-        }
+            }
+        }*/
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -135,6 +141,8 @@ namespace RabbitLabirint
             {
                 IsFinished = true;
             }
+
+            ClearWays();
         }
 
         /// <summary>
@@ -169,8 +177,6 @@ namespace RabbitLabirint
             ResetPlayer();
             currentPlayerGO = Instantiate(playerPrefab, gameObject.transform, false) as GameObject;
 
-
-            //GetRoadTile();
         }
 
         /// <summary>
@@ -182,23 +188,18 @@ namespace RabbitLabirint
             {
                 Destroy(currentPlayerGO);
                 Debug.Log("Reset player " + currentPlayerGO.ToString());
-            }            
+            }
         }
 
-        /*private RoadTile GetRoadTile()
+        public void DrawWays() // TODO: Add states for player (and replace it)
         {
-            Vector3Int coord = grid.WorldToCell(transform.position);
-            Debug.Log(coord);
+            routeBuilder.DrawPossiblePaths();
+        }
 
-            RoadTile rt = tilemap.GetTile<RoadTile>(coord);
-
-            //Debug.Log(rt.Top);
-            //Debug.Log(rt.Right);
-            //Debug.Log(rt.Bottom);
-            //Debug.Log(rt.Left);
-
-            return rt;
-        }*/
+        public void ClearWays() // TODO: Add states for player (and replace it)
+        {
+            routeBuilder.ClearBuiltPaths();
+        }
     }
 
 }
