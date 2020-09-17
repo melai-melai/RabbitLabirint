@@ -58,10 +58,10 @@ namespace RabbitLabirint
             PlayerData.Create();
         }
 
+        
+        
         private void Update()
         {
-            // keyword controls
-
             if (stateStack.Count > 0)
             {
                 stateStack[stateStack.Count - 1].Tick();

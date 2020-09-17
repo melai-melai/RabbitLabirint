@@ -15,6 +15,8 @@ namespace RabbitLabirint
         private Tilemap tilemap;
         [SerializeField]
         private RouteBuilder routeBuilder;
+        [SerializeField]
+        private int maxSteps;
 
         public Grid Grid
         {
@@ -45,6 +47,14 @@ namespace RabbitLabirint
             get
             {
                 return routeBuilder;
+            }
+        }
+
+        public int MaxSteps
+        {
+            get
+            {
+                return maxSteps;
             }
         }
     }

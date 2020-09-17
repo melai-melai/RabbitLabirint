@@ -2316,6 +2316,7 @@ MonoBehaviour:
   playerStartPosition: {fileID: 1449475755782295746}
   tilemap: {fileID: 0}
   routeBuilder: {fileID: 1522969859368229436}
+  maxSteps: 10
 --- !u!1 &7134480278668073413
 GameObject:
   m_ObjectHideFlags: 0

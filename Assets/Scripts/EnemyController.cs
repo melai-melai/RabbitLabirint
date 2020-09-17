@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D collision)
+    /*private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Player")
         {
             Debug.Log("You are died!");
             GameManager.Instance.SwitchState("GameOver");
         }
-    }
+    }*/
 }

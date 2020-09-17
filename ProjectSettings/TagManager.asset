@@ -9,6 +9,7 @@ TagManager:
   - PlayerStartPosition
   - Tilemap
   - Grid
+  - Enemy
   layers:
   - Default
   - TransparentFX

@@ -24,6 +24,7 @@ namespace RabbitLabirint
         {
             canvas.gameObject.SetActive(true);
 
+            PlayerController.Instance.SwitchState("Empty");
             // add music for game over (play)
         }
 

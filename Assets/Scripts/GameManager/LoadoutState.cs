@@ -74,13 +74,5 @@ namespace RabbitLabirint
         {
             gameManager.SwitchState("Game");
         }
-
-        /// <summary>
-        /// Load level (example: click on "level button" on the loadout screen)
-        /// </summary>
-        public override void LoadSelectedLevel()
-        {
-            StartGame();
-        }
     }
 }

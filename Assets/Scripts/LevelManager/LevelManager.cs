@@ -27,6 +27,7 @@ namespace RabbitLabirint
         private Level currentLevel;
         [SerializeField]
         private string defaultLevelName;
+        private LevelProvider levelProvider;
 
         public string CurLevelName
         {
@@ -41,6 +42,14 @@ namespace RabbitLabirint
             get
             {
                 return defaultLevelName;
+            }
+        }
+
+        public LevelProvider LevelData
+        {
+            get
+            {
+                return levelProvider;
             }
         }
 
@@ -63,14 +72,13 @@ namespace RabbitLabirint
                 GameObject newButton = Instantiate(levelButton, levelBox.transform, false) as GameObject;
                 Text btnText = newButton.GetComponentInChildren<Text>();
                 btnText.text = level.levelName;
-                newButton.GetComponent<Button>().onClick.AddListener(() => LoadLevel(level));
+                newButton.GetComponent<Button>().onClick.AddListener(() => LoadSelectedLevel(level));
             }
         }
 
         /// <summary>
         /// Load level (Instantiate level prefab and prepare UI)
-        /// </summary>
-        /// <param name="level"></param>
+        /// </summary>        
         public void LoadLevel(Level level = null)
         {
             if (level != null)
@@ -87,18 +95,13 @@ namespace RabbitLabirint
                 return;
             }
 
-            LevelProvider newLevelProvider = CreateLevel();
-            PlayerController.Instance.PreparePlayerForLevel(newLevelProvider);
-
-            if (GameManager.Instance.topState.GetName() == "Loadout")
-            {
-                GameManager.Instance.topState.LoadSelectedLevel();
-            }
-
-            ToggleLevelSelectPopup(false);
+            CreateLevel();
+            PlayerController.Instance.SwitchState("Idle");
 
             PlayerData.Instance.currentLevel = currentLevel.levelName;
             PlayerData.Instance.Save();
+
+            Debug.Log("Load level");
         }
 
         /// <summary>
@@ -127,13 +130,10 @@ namespace RabbitLabirint
         /// <summary>
         /// Create new level
         /// </summary>
-        /// <returns>LevelProvider contains data about level</returns>
-        private LevelProvider CreateLevel()
+        private void CreateLevel()
         {
             GameObject newLevelGO = Instantiate(currentLevel.levelPrefab);
-            LevelProvider newLevelProvider = newLevelGO.GetComponent<LevelProvider>();
-
-            return newLevelProvider;
+            levelProvider = newLevelGO.GetComponent<LevelProvider>();
         }
 
         /// <summary>
@@ -154,14 +154,18 @@ namespace RabbitLabirint
         /// </summary>
         public void RepeatLevel()
         {
-            DeleteLevel();
+            GameManager.Instance.SwitchState("Game");
+        }
 
-            LevelProvider newLevelProvider = CreateLevel();
-
-            PlayerController.Instance.PreparePlayerForLevel(newLevelProvider);
-
-            UIStep.Instance.SetValue(PlayerController.Instance.Steps);
-            UICarrot.Instance.SetValue(0);
+        /// <summary>
+        /// Load selected level
+        /// </summary>
+        /// <param name="level"></param>
+        public void LoadSelectedLevel(Level level)
+        {
+            currentLevel = level;
+            ToggleLevelSelectPopup(false);
+            GameManager.Instance.SwitchState("Game");
         }
 
         /// <summary>
@@ -178,7 +182,8 @@ namespace RabbitLabirint
             }
             else
             {
-                LoadLevel(nextLevel);
+                currentLevel = nextLevel;
+                GameManager.Instance.SwitchState("Game");
             }            
         }
 

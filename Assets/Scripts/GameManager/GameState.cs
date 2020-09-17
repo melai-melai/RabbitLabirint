@@ -52,10 +52,9 @@ namespace RabbitLabirint
             wholeUI.gameObject.SetActive(false);
             pauseButton.gameObject.SetActive(false);
 
-            LevelManager.Instance.ToggleLevelSelectPopup(false);
             LevelManager.Instance.DeleteLevel();
 
-            PlayerController.Instance.ResetPlayer();
+            PlayerController.Instance.SwitchState("Empty");
 
             // clear all collected points and steps
         }
@@ -74,11 +73,7 @@ namespace RabbitLabirint
         /// </summary>
         public override void Tick()
         {
-            if (PlayerController.Instance.IsFinished) // TODO: change on the event
-            {
-                //    StartCoroutine("WaitForLevelGameOver");
-                OpenTotalInfoPopup();
-            }
+            
         }
         #endregion
 
@@ -91,6 +86,16 @@ namespace RabbitLabirint
         private void OnApplicationFocus(bool focus)
         {
             if (!focus) Pause();
+        }
+
+        private void OnEnable()
+        {
+            PlayerController.onHappenedFinish += OpenTotalInfoPopup;
+        }
+
+        private void OnDisable()
+        {
+            PlayerController.onHappenedFinish -= OpenTotalInfoPopup;
         }
         #endregion
 
@@ -188,7 +193,7 @@ namespace RabbitLabirint
         /// <summary>
         /// Load selected level (example: select from game state)
         /// </summary>
-        public override void LoadSelectedLevel()
+        public void LoadSelectedLevel()
         {
             StartGame();
         }
@@ -209,6 +214,6 @@ namespace RabbitLabirint
         {
             LevelManager.Instance.LoadNextLevel();
             totalInfoPopup.gameObject.SetActive(false);
-        }
+        }        
     }
 }
