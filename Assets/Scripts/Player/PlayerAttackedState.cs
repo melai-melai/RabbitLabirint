@@ -36,11 +36,19 @@ namespace RabbitLabirint
         }
 
         /// <summary>
-        /// Execute every frame (in update function of game manager)
+        /// Execute every frame (in update function of player controller)
         /// </summary>
         public override void Tick()
         {
             
+        }
+
+        /// <summary>
+        /// Execute each fixed frame (in fixedUpdate function player controller)
+        /// </summary>
+        public override void FixedTick()
+        {
+
         }
     }
 }

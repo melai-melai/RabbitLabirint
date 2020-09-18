@@ -7,7 +7,7 @@ namespace RabbitLabirint
     public class PlayerMovingState : PlayerBaseState
     {
         private float speed = 5f;
-        private Vector2 target;
+        private Vector3 target;
         private bool hasTarget ;
 
         /// <summary>
@@ -43,14 +43,11 @@ namespace RabbitLabirint
         }
 
         /// <summary>
-        /// Execute every frame (in update function of game manager)
+        /// Execute every frame (in update function of player controller)
         /// </summary>
         public override void Tick()
         {
-            if (hasTarget)
-            {
-                Move();
-            }            
+                       
         }
 
         /// <summary>
@@ -66,9 +63,15 @@ namespace RabbitLabirint
             }
         }
 
-        /*void FixedUpdate()
+        /// <summary>
+        /// Execute each fixed frame (in fixedUpdate function player controller)
+        /// </summary>
+        public override void FixedTick()
         {
-            Move();
-        }*/        
+            if (hasTarget)
+            {
+                Move();
+            }
+        }
     }
 }

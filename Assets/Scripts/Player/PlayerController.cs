@@ -106,6 +106,14 @@ namespace RabbitLabirint
             }
         }
 
+        private void FixedUpdate()
+        {
+            if (stateStack.Count > 0)
+            {
+                stateStack[stateStack.Count - 1].FixedTick();
+            }
+        }
+
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.gameObject.name == "RabbitHole")
