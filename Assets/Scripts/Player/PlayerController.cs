@@ -23,6 +23,8 @@ namespace RabbitLabirint
 
         public bool OnFinish;
 
+        private int layerMask = 1 << 8; // Bit shift the index of the layer (8 - Tilemap) to get a bit mask
+
         public Vector3 Coordinate
         {
             get
@@ -303,6 +305,30 @@ namespace RabbitLabirint
                 onHappenedFinish();
             }
         }
+
+        #region Helpers
+        /// <summary>
+        /// Check hit on tilemap TODO: need refactoring of raycast
+        /// </summary>
+        /// <param name="inputPosition">Construct a ray from the input coordinates</param>
+        /// <returns></returns>
+        public bool CheckHitTilemap(Vector3 inputPosition)
+        {
+            // Construct a ray from the current input coordinates
+            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity, layerMask);
+
+            //If something was hit, the RaycastHit2D.collider will not be null.
+            if (hit.collider != null)
+            {
+                //Debug.DrawLine(worldPoint, Vector3.zero, Color.green, 10.0f, true);
+                //Debug.Log(hit.transform.gameObject.name + ": " + hit.transform.gameObject.layer);
+                return true;
+            }
+
+            return false;
+        }
+        #endregion
 
     }
 

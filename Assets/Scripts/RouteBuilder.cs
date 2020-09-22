@@ -18,13 +18,13 @@ namespace RabbitLabirint
 
         private List<Vector3> pathPoints = new List<Vector3>();
 
-        public Vector3 Target
+        /*public Vector3 Target
         {
             get
             {
                 return GetCoordinateTarget();
             }
-        }
+        }*/
 
         // Start is called before the first frame update
         void Start()
@@ -57,7 +57,7 @@ namespace RabbitLabirint
             target.gameObject.SetActive(true);
         }*/
 
-        /// <summary>
+        /*/// <summary>
         /// Get the coordinates of the center of the tile clicked on
         /// </summary>
         /// <returns></returns>
@@ -66,18 +66,34 @@ namespace RabbitLabirint
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 coordinate = tilemap.GetCellCenterLocal(Vector3Int.FloorToInt(mouseWorldPos));
             return coordinate;
+        }*/
+
+        /// <summary>
+        /// Get the coordinates of the center of the tile clicked on or tapped
+        /// </summary>
+        /// <returns></returns>
+        Vector3 GetInputTileCoordinate(Vector3 inputCoordinate)
+        {
+            Vector3 coordinate = tilemap.GetCellCenterLocal(Vector3Int.FloorToInt(inputCoordinate));
+            return coordinate;
         }
 
         /// <summary>
-        /// Get target coordinates (the closest to mouse point and belonging to path point)
+        /// Get target coordinates (the closest to input point and belonging to path point)
         /// </summary>
         /// <returns></returns>
-        Vector3 GetCoordinateTarget()
+        public Vector3 GetCoordinateTarget(Vector3 inputCoordinate)
         {
-            Vector3 mouseTileCoordinate = GetCoordinateUnderMouse();
             Vector3 playerTileCoordinate = PlayerController.Instance.Coordinate;
+            Vector3 targetCoordinate = playerTileCoordinate; // TODO: refactoring
 
-            Vector3 targetCoordinate = playerTileCoordinate;
+            if (inputCoordinate == null)
+            {
+                return targetCoordinate;
+            }
+
+            Vector3 mouseTileCoordinate = GetInputTileCoordinate(inputCoordinate);
+            
             float minDistance = Vector3.Distance(playerTileCoordinate, mouseTileCoordinate);
 
             foreach (Vector3 point in pathPoints)

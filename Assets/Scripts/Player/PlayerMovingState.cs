@@ -8,7 +8,7 @@ namespace RabbitLabirint
     {
         private float speed = 5f;
         private Vector3 target;
-        private bool hasTarget ;
+        private bool hasTarget;
 
         /// <summary>
         /// Enter the state
@@ -17,7 +17,7 @@ namespace RabbitLabirint
         public override void Enter(PlayerBaseState prevState)
         {
             Debug.Log("Enter Player Moving State");
-            target = PlayerController.Instance.RouteBuilder.Target;
+            target = PlayerController.Instance.RouteBuilder.GetCoordinateTarget(prevState.InputPosition);
             hasTarget = true;
         }
 

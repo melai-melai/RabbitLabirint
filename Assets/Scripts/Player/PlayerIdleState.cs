@@ -1,11 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace RabbitLabirint
 {
     public class PlayerIdleState : PlayerBaseState
     {
+        bool hasInput = false;
+        Vector3 inputPosition = Vector3.zero;
+
+        /*public override Vector3 InputPosition
+        {
+            get { return Camera.main.ScreenToWorldPoint(inputPosition); }
+        }*/
+
         /// <summary>
         /// Enter the state
         /// </summary>
@@ -21,6 +30,8 @@ namespace RabbitLabirint
         /// <param name="nextState">Next state</param>
         public override void Exit(PlayerBaseState nextState)
         {
+            hasInput = false;
+            inputPosition = Vector3.zero;
             Debug.Log("Exit Player Idle State");
         }
 
@@ -38,10 +49,27 @@ namespace RabbitLabirint
         /// </summary>
         public override void Tick()
         {
-            if (Input.GetMouseButtonDown(0))
+#if UNITY_EDITOR || UNITY_STANDALONE 
+
+            //If the left mouse button is clicked.
+            if (Input.GetMouseButtonDown(0) && EventSystem.current != null && !EventSystem.current.IsPointerOverGameObject(-1))
             {
-                PlayerController.Instance.SwitchState("Waiting");
+                hasInput = true;
+                inputPosition = Input.mousePosition;
             }
+#else 
+            // Use touch input on mobile
+            if (Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+
+                if (EventSystem.current != null && !EventSystem.current.IsPointerOverGameObject(touch.fingerId) && touch.phase == TouchPhase.Began)
+                {
+                    hasInput = true;
+                    inputPosition = touch.position;
+                }
+            }
+#endif
         }
 
         /// <summary>
@@ -49,7 +77,17 @@ namespace RabbitLabirint
         /// </summary>
         public override void FixedTick()
         {
+            if (hasInput)
+            {
+                hasInput = false;
 
+                if (PlayerController.Instance.CheckHitTilemap(inputPosition))
+                {
+                    PlayerController.Instance.SwitchState("Waiting");
+                }              
+            }
         }
+
+        
     }
 }
