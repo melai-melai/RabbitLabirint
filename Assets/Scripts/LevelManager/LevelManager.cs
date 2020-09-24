@@ -27,7 +27,6 @@ namespace RabbitLabirint
         private Level currentLevel;
         [SerializeField]
         private string defaultLevelName;
-        private LevelProvider levelProvider;
 
         public string CurLevelName
         {
@@ -45,13 +44,7 @@ namespace RabbitLabirint
             }
         }
 
-        public LevelProvider LevelData
-        {
-            get
-            {
-                return levelProvider;
-            }
-        }
+        public LevelProvider LevelData { get; private set; }
 
         private void Start()
         {
@@ -133,7 +126,7 @@ namespace RabbitLabirint
         private void CreateLevel()
         {
             GameObject newLevelGO = Instantiate(currentLevel.levelPrefab);
-            levelProvider = newLevelGO.GetComponent<LevelProvider>();
+            LevelData = newLevelGO.GetComponent<LevelProvider>();
         }
 
         /// <summary>
@@ -146,6 +139,7 @@ namespace RabbitLabirint
             if (oldLevel != null)
             {
                 Destroy(oldLevel);
+                LevelData = null;
             }
         }
 

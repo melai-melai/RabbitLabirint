@@ -107,9 +107,9 @@ namespace RabbitLabirint
                 }
             }
 
-            Debug.Log("Mouse coord: " + mouseTileCoordinate);
-            Debug.Log("Target coord: " + targetCoordinate);
-            Debug.Log("Min distance: " + minDistance);
+            //Debug.Log("Mouse coord: " + mouseTileCoordinate);
+            //Debug.Log("Target coord: " + targetCoordinate);
+            //Debug.Log("Min distance: " + minDistance);
             return targetCoordinate;
         }
 
@@ -119,11 +119,14 @@ namespace RabbitLabirint
         /// </summary>
         public void DrawPossiblePaths()
         {
+            ChangeColorForRoadTile(PlayerController.Instance.Coordinate, Color.cyan);
+            pathPoints.Add(PlayerController.Instance.Coordinate);
+
             foreach (string key in directions.Keys.ToList())
             {
                 directions[key] = BuildPathTowards(key, directions[key]);
-                Debug.Log("Конечная точка направления " + key + " равна " + directions[key]);
-            }
+                //Debug.Log("Конечная точка направления " + key + " равна " + directions[key]);
+            }            
         }
 
         /// <summary>
@@ -192,7 +195,7 @@ namespace RabbitLabirint
             foreach (var item in pathPoints)
             {
                 ChangeColorForRoadTile(item, Color.white);
-            }
+            }          
 
             directions["top"] = PlayerController.Instance.Coordinate;
             directions["bottom"] = PlayerController.Instance.Coordinate;

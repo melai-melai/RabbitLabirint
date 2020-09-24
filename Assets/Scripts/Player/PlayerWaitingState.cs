@@ -10,6 +10,8 @@ namespace RabbitLabirint
         bool hasInput = false;
         Vector3 inputPosition = Vector3.zero;
 
+        public PlayerWaitingState(string name) : base(name) {}
+
         public override Vector3 InputPosition
         {
             get { return Camera.main.ScreenToWorldPoint(inputPosition); }
@@ -34,15 +36,6 @@ namespace RabbitLabirint
         {
             hasInput = false;
             Debug.Log("Exit Player Waiting State");
-        }
-
-        /// <summary>
-        /// Get name of the state
-        /// </summary>
-        /// <returns>string name</returns>
-        public override string GetName()
-        {
-            return "Waiting";
         }
 
         /// <summary>

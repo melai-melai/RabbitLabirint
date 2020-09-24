@@ -27,6 +27,7 @@ namespace RabbitLabirint
         public RectTransform pauseMenu;
         public Button pauseButton;
         public RectTransform totalInfoPopup;
+        public TMP_Text totalInfoText;
 
         protected bool isFinished;
 
@@ -187,6 +188,8 @@ namespace RabbitLabirint
         /// </summary>
         private void OpenTotalInfoPopup()
         {
+            isFinished = true;
+            totalInfoText.text = GetResultStars() + " stars";
             totalInfoPopup.gameObject.SetActive(true);
         }
 
@@ -214,6 +217,28 @@ namespace RabbitLabirint
         {
             LevelManager.Instance.LoadNextLevel();
             totalInfoPopup.gameObject.SetActive(false);
-        }        
+        }
+
+
+
+
+
+
+
+        private int GetResultStars()
+        {
+            int stars = 1;
+
+            if (PlayerController.Instance.Steps >= 2)
+            {
+                stars = 3;
+            }
+            else if (PlayerController.Instance.Steps == 1)
+            {
+                stars = 2;
+            }
+
+            return stars;            
+        }
     }
 }

@@ -22,9 +22,9 @@ namespace RabbitLabirint
         /// <param name="from">Previous state</param>
         public override void Enter(State from)
         {
+            Debug.Log("GAME OVER!!!!!!!!!!!!!!!");
             canvas.gameObject.SetActive(true);
 
-            PlayerController.Instance.SwitchState("Empty");
             // add music for game over (play)
         }
 

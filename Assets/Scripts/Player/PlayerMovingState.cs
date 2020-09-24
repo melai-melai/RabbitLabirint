@@ -10,6 +10,8 @@ namespace RabbitLabirint
         private Vector3 target;
         private bool hasTarget;
 
+        public PlayerMovingState(string name) : base(name) {}
+
         /// <summary>
         /// Enter the state
         /// </summary>
@@ -31,15 +33,6 @@ namespace RabbitLabirint
             PlayerController.Instance.ChangeSteps(1);
             PlayerController.Instance.RouteBuilder.ClearBuiltPaths();
             Debug.Log("Exit Player Moving State");
-        }
-
-        /// <summary>
-        /// Get name of the state
-        /// </summary>
-        /// <returns>string name</returns>
-        public override string GetName()
-        {
-            return "Moving";
         }
 
         /// <summary>

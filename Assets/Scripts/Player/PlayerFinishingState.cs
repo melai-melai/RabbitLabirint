@@ -6,6 +6,8 @@ namespace RabbitLabirint
 {
     public class PlayerFinishingState : PlayerBaseState
     {
+        public PlayerFinishingState(string name) : base(name) {}
+
         /// <summary>
         /// Enter the state
         /// </summary>
@@ -13,7 +15,8 @@ namespace RabbitLabirint
         public override void Enter(PlayerBaseState prevState)
         {
             Debug.Log("Enter Player Finishing State");
-            if (PlayerController.Instance.OnFinish)
+
+            if (PlayerController.Instance.OnFinish && IsGoalReached())
             {
                 PlayerController.Instance.SwitchState("Finished");
             } 
@@ -37,16 +40,6 @@ namespace RabbitLabirint
         public override void Exit(PlayerBaseState nextState)
         {
             Debug.Log("Exit Player Finishing State");
-            PlayerController.Instance.OnFinish = false;
-        }
-
-        /// <summary>
-        /// Get name of the state
-        /// </summary>
-        /// <returns>string name</returns>
-        public override string GetName()
-        {
-            return "Finishing";
         }
 
         /// <summary>
@@ -63,6 +56,20 @@ namespace RabbitLabirint
         public override void FixedTick()
         {
 
+        }
+
+        /// <summary>
+        /// Checks if the goal has been achieved
+        /// </summary>
+        private bool IsGoalReached()
+        {
+            // the player has collected all the carrots in the level
+            if (PlayerController.Instance.Points == LevelManager.Instance.LevelData.Carrots)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

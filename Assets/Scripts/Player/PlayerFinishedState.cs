@@ -4,8 +4,13 @@ using UnityEngine;
 
 namespace RabbitLabirint
 {
+    /// <summary>
+    /// The state of the player upon successful completion of the level
+    /// </summary>
     public class PlayerFinishedState : PlayerBaseState
     {
+        public PlayerFinishedState(string name) : base(name) {}
+
         /// <summary>
         /// Enter the state
         /// </summary>
@@ -13,7 +18,6 @@ namespace RabbitLabirint
         public override void Enter(PlayerBaseState prevState)
         {
             // animation
-            Debug.Log("Reached the finish");
             Debug.Log("Enter Player Finished State");
 
             PlayerController.CallOnFinished(); // TODO: need refactoring
@@ -26,15 +30,6 @@ namespace RabbitLabirint
         public override void Exit(PlayerBaseState nextState)
         {
             Debug.Log("Exit Player Finished State");
-        }
-
-        /// <summary>
-        /// Get name of the state
-        /// </summary>
-        /// <returns>string name</returns>
-        public override string GetName()
-        {
-            return "Finished";
         }
 
         /// <summary>

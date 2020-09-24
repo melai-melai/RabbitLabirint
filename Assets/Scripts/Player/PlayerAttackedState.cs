@@ -6,6 +6,8 @@ namespace RabbitLabirint
 {
     public class PlayerAttackedState : PlayerBaseState
     {
+        public PlayerAttackedState(string name) : base(name) {}
+
         /// <summary>
         /// Enter the state
         /// </summary>
@@ -24,15 +26,6 @@ namespace RabbitLabirint
         public override void Exit(PlayerBaseState nextState)
         {
             Debug.Log("Exit Player Attacked State");
-        }
-
-        /// <summary>
-        /// Get name of the state
-        /// </summary>
-        /// <returns>string name</returns>
-        public override string GetName()
-        {
-            return "Attacked";
         }
 
         /// <summary>

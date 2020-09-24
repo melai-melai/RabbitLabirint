@@ -14,7 +14,7 @@ namespace RabbitLabirint
             if (other.gameObject.CompareTag("Player"))
             {
                 PlayerController.Instance.ChangePoints(point);
-                Destroy(gameObject);
+                gameObject.SetActive(false);
             }
         }
     }

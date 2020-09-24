@@ -1,10 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace RabbitLabirint
 {
     public abstract class PlayerBaseState
     {
+        private string name;
+
         public virtual Vector3 InputPosition { get; }
+
+        protected PlayerBaseState(string name)
+        {
+            this.name = name ?? throw new ArgumentNullException(nameof(name));
+        }        
 
         public abstract void Enter(PlayerBaseState prevState);
         public abstract void Exit(PlayerBaseState nextState);
@@ -12,6 +20,13 @@ namespace RabbitLabirint
 
         public abstract void FixedTick();
 
-        public abstract string GetName();
+        /// <summary>
+        /// Get name of the state
+        /// </summary>
+        /// <returns>string name</returns>
+        public string GetName()
+        {
+            return name;
+        }
     }
 }

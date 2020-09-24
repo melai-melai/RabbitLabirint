@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,6 +10,8 @@ namespace RabbitLabirint
     {
         bool hasInput = false;
         Vector3 inputPosition = Vector3.zero;
+
+        public PlayerIdleState(string name) : base(name) {}
 
         /*public override Vector3 InputPosition
         {
@@ -33,15 +36,6 @@ namespace RabbitLabirint
             hasInput = false;
             inputPosition = Vector3.zero;
             Debug.Log("Exit Player Idle State");
-        }
-
-        /// <summary>
-        /// Get name of the state
-        /// </summary>
-        /// <returns>string name</returns>
-        public override string GetName()
-        {
-            return "Idle";
         }
 
         /// <summary>

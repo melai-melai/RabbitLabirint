@@ -14,10 +14,7 @@ namespace RabbitLabirint
         [HideInInspector]
         public GameObject currentPlayerGO;
 
-        
         private Camera cam;
-        private int currentPoints;
-        private RouteBuilder routeBuilder;
         private Grid grid;
         private Tilemap tilemap;
 
@@ -35,31 +32,35 @@ namespace RabbitLabirint
 
         public int Steps { get; private set; }
 
-        public RouteBuilder RouteBuilder
-        {
-            get
-            {
-                return routeBuilder;
-            }
-        }
+        public int Points { get; private set; }
+
+        public RouteBuilder RouteBuilder { get; private set; }
 
         #endregion
 
+        #region Events
         public delegate void OnHappenedFinish();
         public static event OnHappenedFinish onHappenedFinish;
+        #endregion
 
-
-
-
+        #region States Variables
+        private const string nameEmptyState = "Empty";
+        private const string nameIdleState = "Idle";
+        private const string nameWaitingState = "Waiting";
+        private const string nameMovingState = "Moving";
+        private const string nameAttackedState = "Attacked";
+        private const string nameFinishingState = "Finishing";
+        private const string nameFinishedState = "Finished";
+        
 
         protected PlayerBaseState[] states = new PlayerBaseState[] { 
-            new PlayerEmptyState(),
-            new PlayerIdleState(),
-            new PlayerWaitingState(),
-            new PlayerMovingState(),
-            new PlayerAttackedState(),
-            new PlayerFinishingState(),
-            new PlayerFinishedState(),
+            new PlayerEmptyState(nameEmptyState),
+            new PlayerIdleState(nameIdleState),
+            new PlayerWaitingState(nameWaitingState),
+            new PlayerMovingState(nameMovingState),
+            new PlayerAttackedState(nameAttackedState),
+            new PlayerFinishingState(nameFinishingState),
+            new PlayerFinishedState(nameFinishedState),
         };
         protected List<PlayerBaseState> stateStack = new List<PlayerBaseState>();
         protected Dictionary<string, PlayerBaseState> stateDictionary = new Dictionary<string, PlayerBaseState>();
@@ -74,6 +75,7 @@ namespace RabbitLabirint
                 return stateStack[stateStack.Count - 1];
             }
         }
+        #endregion
 
         public override void Init()
         {
@@ -96,8 +98,6 @@ namespace RabbitLabirint
             stateStack.Clear();
 
             PushState(states[0].GetName());
-
-            OnFinish = false;
         }
 
         private void Update()
@@ -122,10 +122,18 @@ namespace RabbitLabirint
             {
                 OnFinish = true;
             }
-            else if (collision.tag == "Enemy")
+            else if (collision.tag == "Enemy" && topState.GetName() == nameMovingState)
             {
                 Debug.Log("You are died!");
                 SwitchState("Attacked");
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            if (collision.gameObject.name == "RabbitHole")
+            {
+                OnFinish = false;
             }
         }
 
@@ -150,8 +158,8 @@ namespace RabbitLabirint
 
         public void ChangePoints(int amount)
         {
-            currentPoints += amount;
-            UICarrot.Instance.SetValue(currentPoints);
+            Points += amount;
+            UICarrot.Instance.SetValue(Points);
         }
 
         public void ChangeSteps(int amount)
@@ -166,6 +174,7 @@ namespace RabbitLabirint
         public void SetPlayerData()
         {
             LevelProvider lvl = LevelManager.Instance.LevelData;
+
             if (lvl == null)
             {
                 Debug.Log("Level is not available!");
@@ -175,12 +184,11 @@ namespace RabbitLabirint
 
             transform.position = lvl.PlayerStartPosition.position;
 
-            currentPoints = 0;
             Steps = lvl.MaxSteps;
-
+            
             grid = lvl.Grid;
             tilemap = lvl.Tilemap;
-            routeBuilder = lvl.RouteBuilder;
+            RouteBuilder = lvl.RouteBuilder;
 
             DestroyPlayerGO();
             CreatePlayerGO();
@@ -193,12 +201,14 @@ namespace RabbitLabirint
         {
             transform.position = Vector3.zero;
 
-            currentPoints = 0;
+            Points = 0;
+            OnFinish = false;
+
             Steps = 0;
 
             grid = null;
             tilemap = null;
-            routeBuilder = null;
+            RouteBuilder = null;
 
             DestroyPlayerGO();
         }
@@ -216,6 +226,7 @@ namespace RabbitLabirint
                 Debug.Log("Reset player " + currentPlayerGO.ToString());
             }
         }
+
 
         #region State management
         /// <summary>
@@ -300,6 +311,8 @@ namespace RabbitLabirint
 
         public static void CallOnFinished()
         {
+            // check if the winning conditions are met
+
             if (onHappenedFinish != null)
             {
                 onHappenedFinish();
@@ -329,7 +342,6 @@ namespace RabbitLabirint
             return false;
         }
         #endregion
-
     }
 
 }
