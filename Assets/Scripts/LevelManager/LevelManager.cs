@@ -14,9 +14,26 @@ namespace RabbitLabirint
         {
             public string levelName;
             public GameObject levelPrefab;
-            public int state;
 
             //public Button.ButtonClickedEvent onClickEvent;
+
+            public enum LevelState
+            {
+                Locked,
+                Unlocked                
+            }
+
+            public LevelState currentState;
+
+            public enum ResultPassing
+            {
+                NotPassed,
+                Low,
+                Middle,
+                High
+            }
+
+            public ResultPassing currentResult;
         }
 
         public GameObject canvas;
@@ -62,10 +79,38 @@ namespace RabbitLabirint
         {
             foreach (var level in levelList)
             {
-                GameObject newButton = Instantiate(levelButton, levelBox.transform, false) as GameObject;
-                Text btnText = newButton.GetComponentInChildren<Text>();
-                btnText.text = level.levelName;
-                newButton.GetComponent<Button>().onClick.AddListener(() => LoadSelectedLevel(level));
+                GameObject newButtonGO = Instantiate(levelButton, levelBox.transform, false) as GameObject;
+                Text btnText = newButtonGO.GetComponentInChildren<Text>();
+                Button newButton = newButtonGO.GetComponent<Button>();
+                btnText.text = level.levelName + " - " + level.currentState + " - " + level.currentResult;
+
+                switch (level.currentState)
+                {
+                    case Level.LevelState.Locked:
+                        newButton.interactable = false;
+                        Debug.Log("Locked");
+                        break;
+                    case Level.LevelState.Unlocked:
+                        newButton.GetComponent<Button>().onClick.AddListener(() => LoadSelectedLevel(level));
+                        Debug.Log("Unlocked");
+                        break;
+                }
+
+                switch (level.currentResult)
+                {
+                    case Level.ResultPassing.NotPassed:
+                        Debug.Log("NotPassed");
+                        break;
+                    case Level.ResultPassing.Low:
+                        Debug.Log("Low");
+                        break;
+                    case Level.ResultPassing.Middle:
+                        Debug.Log("Middle");
+                        break;
+                    case Level.ResultPassing.High:
+                        Debug.Log("High");
+                        break;
+                }
             }
         }
 
