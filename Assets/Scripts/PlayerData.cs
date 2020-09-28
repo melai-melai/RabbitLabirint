@@ -22,10 +22,10 @@ namespace RabbitLabirint
         public float masterVolume = float.MinValue;
         public float musicVolume = float.MinValue;
         public float masterSFXVolume = float.MinValue;
-        public int resolutionWidth;
+        /*public int resolutionWidth;
         public int resolutionHeight;
         public bool isFullScreen;
-        public int qualityLevel;
+        public int qualityLevel;*/
 
         static int version = 1;
 
@@ -79,10 +79,10 @@ namespace RabbitLabirint
                 masterVolume = r.ReadSingle();
                 musicVolume = r.ReadSingle();
                 masterSFXVolume = r.ReadSingle();
-                resolutionWidth = r.ReadInt32();
+                /*resolutionWidth = r.ReadInt32();
                 resolutionHeight = r.ReadInt32();
                 isFullScreen = r.ReadBoolean();
-                qualityLevel = r.ReadInt32();
+                qualityLevel = r.ReadInt32();*/
 
                 // Read levels
                 levels.Clear();
@@ -108,12 +108,12 @@ namespace RabbitLabirint
             _instance.currentLevel = LevelManager.Instance.DefaultLevelName;
             _instance.levels.Add(_instance.currentLevel, (int)LevelManager.Level.ResultPassing.NotPassed);
 
-            _instance.resolutionWidth = Screen.currentResolution.width;
+            /*_instance.resolutionWidth = Screen.currentResolution.width;
             _instance.resolutionHeight = Screen.currentResolution.height;
 
             _instance.isFullScreen = Screen.fullScreen;
 
-            _instance.qualityLevel = QualitySettings.GetQualityLevel();
+            _instance.qualityLevel = QualitySettings.GetQualityLevel();*/
 
             _instance.Save();
         }
@@ -133,12 +133,12 @@ namespace RabbitLabirint
             w.Write(musicVolume);
             w.Write(masterSFXVolume);
 
-            w.Write(resolutionWidth);
+            /*w.Write(resolutionWidth);
             w.Write(resolutionHeight);
 
             w.Write(isFullScreen);
 
-            w.Write(qualityLevel);
+            w.Write(qualityLevel);*/
 
             // Write levels
             w.Write(levels.Count);

@@ -30,7 +30,6 @@ namespace RabbitLabirint
             base.Init();
 
             
-
             audioSource = GetComponent<AudioSource>();
             //PlayNewBackgroundMusic(menuClip);
 

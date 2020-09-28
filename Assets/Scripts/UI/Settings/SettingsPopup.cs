@@ -12,7 +12,8 @@ namespace RabbitLabirint
         [SerializeField]
         private AudioMixer audioMixer;
 
-        [SerializeField]
+
+        /*[SerializeField]
         private TMP_Dropdown qualityDropdown;
 
         [SerializeField]
@@ -20,7 +21,7 @@ namespace RabbitLabirint
 
         [SerializeField]
         private TMP_Dropdown resolutionDropdown;
-        private Resolution[] resolutions;
+        private Resolution[] resolutions;*/
 
         [SerializeField]
         private Slider volumeSlider;
@@ -36,20 +37,20 @@ namespace RabbitLabirint
         private float volumeMusic;
         private float volumeSFX;
 
-        private float maxValueVolumeSlider = 1.0f;
+        private readonly float maxValueVolumeSlider = 1.0f;
 
         public LoadoutState loadoutState;
         public DataDeleteConfirmation confirmationPopup;
 
         private void Start()
         {
-            Open();
+            
         }
 
         /// <summary>
         /// Get all quality level names and set list for quality dropdown
         /// </summary>
-        private void SetListForQualityDropdown()
+        /*private void SetListForQualityDropdown()
         {
             qualityDropdown.ClearOptions();
             List <string> names = new List<string>(QualitySettings.names);
@@ -57,12 +58,12 @@ namespace RabbitLabirint
             qualityDropdown.AddOptions(names);
             qualityDropdown.value = qualityLevel - 1;
             qualityDropdown.RefreshShownValue();
-        }
+        }*/
 
         /// <summary>
         /// Get all resolution for screen and set list for resolution dropdown
         /// </summary>
-        private void SetListForResolutionDropdown()
+        /*private void SetListForResolutionDropdown()
         {
             resolutions = Screen.resolutions;
 
@@ -86,7 +87,7 @@ namespace RabbitLabirint
             resolutionDropdown.AddOptions(options);
             resolutionDropdown.value = currentResolutionIndex;
             resolutionDropdown.RefreshShownValue();
-        }
+        }*/
 
         public void Open()
         {
@@ -102,8 +103,8 @@ namespace RabbitLabirint
 
         private void UpdateUI()
         {
-            SetListForQualityDropdown();
-            SetListForResolutionDropdown();
+            //SetListForQualityDropdown();
+            //SetListForResolutionDropdown();
 
             audioMixer.GetFloat(volumeParamName, out volume);
             audioMixer.GetFloat(volumeMusicParamName, out volumeMusic);
@@ -113,7 +114,7 @@ namespace RabbitLabirint
             volumeMusicSlider.value = maxValueVolumeSlider - (volumeMusic / minVolume);
             volumeSFXSlider.value = maxValueVolumeSlider - (volumeSFX / minVolume);
 
-            fullScreenToggle.enabled = Screen.fullScreen;
+            //fullScreenToggle.enabled = Screen.fullScreen;
         }
 
         /// <summary>
@@ -153,34 +154,34 @@ namespace RabbitLabirint
         /// Set game screen resolution
         /// </summary>
         /// <param name="resolutionIndex"></param>
-        public void SetResolution(int resolutionIndex)
+        /*public void SetResolution(int resolutionIndex)
         {
             Resolution resolution = resolutions[resolutionIndex];
             Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
             PlayerData.Instance.resolutionWidth = resolution.width;
             PlayerData.Instance.resolutionHeight = resolution.height;
-        }
+        }*/
 
         /// <summary>
         /// Set graphics quality
         /// </summary>
         /// <param name="qualityIndex"></param>
-        public void SetQuality(int qualityIndex)
+        /*public void SetQuality(int qualityIndex)
         {
             int qualityLevel = qualityIndex + 1;
             QualitySettings.SetQualityLevel(qualityLevel);
             PlayerData.Instance.qualityLevel = qualityLevel;
-        }
+        }*/
 
         /// <summary>
         /// Set full screen
         /// </summary>
         /// <param name="isFullScreen"></param>
-        public void SetFullScreen(bool isFullScreen)
+        /*public void SetFullScreen(bool isFullScreen)
         {
             Screen.fullScreen = isFullScreen;
             PlayerData.Instance.isFullScreen = isFullScreen;
-        }
+        }*/
 
         public void DeleteData()
         {
