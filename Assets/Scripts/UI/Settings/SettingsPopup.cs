@@ -38,6 +38,9 @@ namespace RabbitLabirint
 
         private float maxValueVolumeSlider = 1.0f;
 
+        public LoadoutState loadoutState;
+        public DataDeleteConfirmation confirmationPopup;
+
         private void Start()
         {
             Open();
@@ -177,6 +180,11 @@ namespace RabbitLabirint
         {
             Screen.fullScreen = isFullScreen;
             PlayerData.Instance.isFullScreen = isFullScreen;
+        }
+
+        public void DeleteData()
+        {
+            confirmationPopup.Open(loadoutState);
         }
     }
 }

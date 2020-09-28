@@ -75,5 +75,10 @@ namespace RabbitLabirint
             LevelManager.Instance.SetCurrentLevelFromSave(); // TODO: needs refactoring
             gameManager.SwitchState("Game");
         }
+
+        public void Refresh()
+        {
+            // refresh levels buttons
+        }
     }
 }
