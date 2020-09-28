@@ -20,7 +20,7 @@ namespace RabbitLabirint
             // animation
             Debug.Log("Enter Player Finished State");
 
-            PlayerController.CallOnFinished(); // TODO: need refactoring
+            PlayerController.CallOnFinished();
         }
 
         /// <summary>

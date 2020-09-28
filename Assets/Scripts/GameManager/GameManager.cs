@@ -58,8 +58,11 @@ namespace RabbitLabirint
             PlayerData.Create();
         }
 
-        
-        
+        private void OnDisable()
+        {
+            
+        }
+
         private void Update()
         {
             if (stateStack.Count > 0)

@@ -219,26 +219,24 @@ namespace RabbitLabirint
             totalInfoPopup.gameObject.SetActive(false);
         }
 
-
-
-
-
-
-
+        #region Helpers
+        /// <summary>
+        /// Get the result of the level depending on the status of passing the level
+        /// </summary>
+        /// <returns>Stars earned per level</returns>
         private int GetResultStars()
         {
-            int stars = 1;
-
-            if (PlayerController.Instance.Steps >= 2)
+            switch (LevelManager.Instance.CurLevelResult)
             {
-                stars = 3;
-            }
-            else if (PlayerController.Instance.Steps == 1)
-            {
-                stars = 2;
-            }
-
-            return stars;            
+                case LevelManager.Level.ResultPassing.High:
+                    return 3;
+                case LevelManager.Level.ResultPassing.Middle:
+                    return 2;
+                case LevelManager.Level.ResultPassing.Low:
+                    return 1;
+                default: return 0;
+            }           
         }
+        #endregion
     }
 }

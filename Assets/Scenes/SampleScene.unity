@@ -2370,7 +2370,7 @@ MonoBehaviour:
     currentResult: 0
   - levelName: Level 1
     levelPrefab: {fileID: 7134480277635795497, guid: cb3c79f3f6779af46afec3b4dbe7c13e, type: 3}
-    currentState: 1
+    currentState: 0
     currentResult: 0
   - levelName: Level 2
     levelPrefab: {fileID: 3577754017831177661, guid: 0840d80a3fc3c28408771a2cbea86fea, type: 3}

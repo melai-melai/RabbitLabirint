@@ -72,6 +72,7 @@ namespace RabbitLabirint
         /// </summary>
         public void StartGame()
         {
+            LevelManager.Instance.SetCurrentLevelFromSave(); // TODO: needs refactoring
             gameManager.SwitchState("Game");
         }
     }

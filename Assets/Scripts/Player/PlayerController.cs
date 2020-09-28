@@ -308,20 +308,9 @@ namespace RabbitLabirint
         }
         #endregion
 
-
-        public static void CallOnFinished()
-        {
-            // check if the winning conditions are met
-
-            if (onHappenedFinish != null)
-            {
-                onHappenedFinish();
-            }
-        }
-
         #region Helpers
         /// <summary>
-        /// Check hit on tilemap TODO: need refactoring of raycast
+        /// Check hit on tilemap // TODO: need refactoring of raycast
         /// </summary>
         /// <param name="inputPosition">Construct a ray from the input coordinates</param>
         /// <returns></returns>
@@ -340,6 +329,17 @@ namespace RabbitLabirint
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Call at the finish // TODO: needs refactoring
+        /// </summary>
+        public static void CallOnFinished()
+        {
+            if (onHappenedFinish != null)
+            {
+                onHappenedFinish();
+            }
         }
         #endregion
     }
