@@ -353,10 +353,12 @@ namespace RabbitLabirint
         #endregion
 
         #region Helpers
+        /// <summary>
+        /// Set current saved level
+        /// </summary>
         public void SetCurrentLevelFromSave()
         {
             string savedCurrentLevelName = PlayerData.Instance.currentLevel;
-            Debug.Log("Saved current level name: " + savedCurrentLevelName);
             currentLevel = FindLevelByName(savedCurrentLevelName);
         }
 

@@ -15,6 +15,7 @@ namespace RabbitLabirint
         static public PlayerData Instance { get { return _instance; } }
 
         protected string saveFile = "";
+        protected const string saveFileName = "/save.bin";
 
         // Data is for a save
         public string currentLevel;
@@ -38,26 +39,20 @@ namespace RabbitLabirint
             if (_instance == null)
             {
                 _instance = new PlayerData();
-
-                // database loaders
             }
 
-            _instance.saveFile = Application.persistentDataPath + "/save.bin";
+            _instance.saveFile = Application.persistentDataPath + saveFileName;
 
             if (File.Exists(_instance.saveFile))
             {
                 // If we have a save, we read it
                 _instance.Read();
-                Debug.Log("Read saved game data");
             }
             else
             {
                 // If not we create one with default data
                 CreateNewSave();
-                Debug.Log("Create new game data");
             }
-
-            Debug.Log(Application.persistentDataPath);
         }
 
         /// <summary>
@@ -178,7 +173,7 @@ namespace RabbitLabirint
             [MenuItem("Rabbit Labirint Debug/Clear Save")]
             static public void ClearSave()
             {
-                File.Delete(Application.persistentDataPath + "/save.bin");
+                File.Delete(Application.persistentDataPath + saveFileName);
             }
         }
 #endif
