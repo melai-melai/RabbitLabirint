@@ -17,10 +17,9 @@ namespace RabbitLabirint
         /// <param name="prevState">Previous state</param>
         public override void Enter(PlayerBaseState prevState)
         {
-            // animation
             Debug.Log("Enter Player Finished State");
 
-            PlayerController.CallOnFinished();
+            PlayerController.Instance.CallOnFinished();
         }
 
         /// <summary>

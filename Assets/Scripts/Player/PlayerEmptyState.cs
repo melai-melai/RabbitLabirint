@@ -16,6 +16,7 @@ namespace RabbitLabirint
         public override void Enter(PlayerBaseState prevState)
         {
             Debug.Log("Enter Player Empty State");
+            PlayerController.Instance.RemoveShield();
             PlayerController.Instance.ResetPlayerData();
         }
 

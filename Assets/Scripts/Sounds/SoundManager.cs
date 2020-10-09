@@ -13,10 +13,20 @@ namespace RabbitLabirint
 
         [SerializeField]
         private AudioMixer audioMixer;
+        private AudioSource audioSource;
+
+        [Header("UI")]
+        [SerializeField]
+        private AudioSource UISource;
+        //[SerializeField]
+        //private AudioClip buttonClip;
 
         public override void Init()
         {
             base.Init();
+
+            audioSource = GetComponent<AudioSource>();
+            //PlayNewBackgroundMusic(menuClip);
         }
 
         // Start is called before the first frame update
@@ -40,7 +50,7 @@ namespace RabbitLabirint
 
         }
 
-        #region Music management
+        #region Music setting management
         /// <summary>
         /// Set audio mixer volume from player data
         /// </summary>
@@ -63,5 +73,23 @@ namespace RabbitLabirint
             PlayerData.Instance.Save();
         }
         #endregion
+
+        /// <summary>
+        /// Set new background audio clip and play it
+        /// </summary>
+        /// <param name="newClip"></param>
+        public void PlayNewBackgroundMusic(AudioClip newClip)
+        {
+            audioSource.clip = newClip;
+            audioSource.Play();
+        }
+
+        /// <summary>
+        /// Play sound after click on UI button
+        /// </summary>
+        public void PlayUIButtonSound()
+        {
+            UISource.Play();
+        }
     }
 }

@@ -50,6 +50,7 @@ namespace RabbitLabirint
             {
                 hasInput = true;
                 inputPosition = Input.mousePosition;
+                SoundManager.Instance.PlayUIButtonSound();
             }
 #else 
             // Use touch input on mobile
@@ -61,6 +62,7 @@ namespace RabbitLabirint
                 {
                     hasInput = true;
                     inputPosition = touch.position;
+                    SoundManager.Instance.PlayUIButtonSound();
                 }
             }
 #endif

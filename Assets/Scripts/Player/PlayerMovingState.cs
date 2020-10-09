@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +8,7 @@ namespace RabbitLabirint
 {
     public class PlayerMovingState : PlayerBaseState
     {
-        private float speed = 5f;
+        private float speed = 3f;
         private Vector3 target;
         private bool hasTarget;
 
@@ -21,6 +23,9 @@ namespace RabbitLabirint
             Debug.Log("Enter Player Moving State");
             target = PlayerController.Instance.RouteBuilder.GetCoordinateTarget(prevState.InputPosition);
             hasTarget = true;
+
+            PlayerController.Instance.SetMovingAnimation(true);
+            PlayerController.Instance.PlaySound(PlayerController.PlayerSound.Run);
         }
 
         /// <summary>
@@ -32,6 +37,9 @@ namespace RabbitLabirint
             hasTarget = false;
             PlayerController.Instance.ChangeSteps(1);
             PlayerController.Instance.RouteBuilder.ClearBuiltPaths();
+
+            PlayerController.Instance.SetMovingAnimation(false);
+            PlayerController.Instance.StopSound();
             Debug.Log("Exit Player Moving State");
         }
 

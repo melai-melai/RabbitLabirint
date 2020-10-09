@@ -41,6 +41,7 @@ namespace RabbitLabirint
 
         public LoadoutState loadoutState;
         public DataDeleteConfirmation confirmationPopup;
+        public AboutPopup aboutPopup;
 
         private void Start()
         {
@@ -183,9 +184,20 @@ namespace RabbitLabirint
             PlayerData.Instance.isFullScreen = isFullScreen;
         }*/
 
+        /// <summary>
+        /// Open confirmation popup
+        /// </summary>
         public void DeleteData()
         {
             confirmationPopup.Open(loadoutState);
+        }
+
+        /// <summary>
+        /// Open about popup
+        /// </summary>
+        public void ShowAboutInfo()
+        {
+            aboutPopup.Open();
         }
     }
 }

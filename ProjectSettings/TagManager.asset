@@ -10,6 +10,7 @@ TagManager:
   - Tilemap
   - Grid
   - Enemy
+  - Hole
   layers:
   - Default
   - TransparentFX

@@ -21,7 +21,7 @@ namespace RabbitLabirint
             public enum LevelState
             {
                 Locked,
-                Unlocked                
+                Unlocked
             }
 
             public LevelState currentState;
@@ -38,9 +38,11 @@ namespace RabbitLabirint
         }
 
         public GameObject canvas;
-        public GameObject levelButton;
+        public Text levelTitle;
+        public GameObject levelButtonPrefab;
         public Transform levelBox;
-        public List<Level> levelList = new List<Level>();
+        public List<Level> levelList = new List<Level>();               // full level list of game
+        private List<Level> playerLevelList;                            // total player level list for drawing of level buttons
 
         private Level currentLevel;
         [SerializeField]
@@ -53,7 +55,6 @@ namespace RabbitLabirint
                 return currentLevel.levelName;
             }
         }
-
         public string DefaultLevelName
         {
             get
@@ -61,12 +62,11 @@ namespace RabbitLabirint
                 return defaultLevelName;
             }
         }
-
         public Level.ResultPassing CurLevelResult
         {
             get
             {
-                return currentLevel.currentResult;
+                return GetResult();
             }
         }
 
@@ -74,12 +74,65 @@ namespace RabbitLabirint
 
         private void Start()
         {
-            SetCurrentLevelFromSave();
+            playerLevelList = new List<Level>();
 
-            FillList();            
-            // TODO: needs refactoring after refactoring FillList()
-            //string nameLastSavedLevel = PlayerData.Instance.levels.Keys.Last();
-            //currentLevel = FindLevelByName(nameLastSavedLevel); 
+            FormPlayerList();
+
+            SetCurrentLevel();
+
+            DrawLevelList();
+        }
+
+        /// <summary>
+        /// Form player's level list (possible game levels plus player's saved levels)
+        /// </summary>
+        public void FormPlayerList()
+        {
+            playerLevelList.Clear();
+
+            // copy full level list of game
+            foreach (Level lvl in levelList)
+            {
+                Level newLevel = new Level
+                {
+                    levelName = lvl.levelName,
+                    levelPrefab = lvl.levelPrefab,
+                    currentState = lvl.currentState,
+                    currentResult = lvl.currentResult
+                };
+
+                playerLevelList.Add(newLevel);
+            }
+
+            Dictionary<string, int> savedLevels = PlayerData.Instance.levels;   // saved levels
+            string nameLastSavedLevel = savedLevels.Keys.Last();
+            bool setNextUnlocked = false;                                       // trigger for setting last available level            
+
+            // form a summary list with levels for the player
+            foreach (Level lvl in playerLevelList)
+            {
+                if (savedLevels.ContainsKey(lvl.levelName))
+                {
+                    lvl.currentState = Level.LevelState.Unlocked;
+                    int savedResult = savedLevels[lvl.levelName];
+                    lvl.currentResult = (Level.ResultPassing)savedResult;
+
+                    if (lvl.currentResult != Level.ResultPassing.NotPassed && lvl.levelName == nameLastSavedLevel)
+                    {
+                        setNextUnlocked = true;
+                    }
+                }
+                else if (setNextUnlocked)
+                {
+                    lvl.currentState = Level.LevelState.Unlocked;
+                    lvl.currentResult = Level.ResultPassing.NotPassed;
+                    setNextUnlocked = false;
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
 
         private void OnEnable()
@@ -116,8 +169,6 @@ namespace RabbitLabirint
 
             PlayerData.Instance.currentLevel = currentLevel.levelName;
             PlayerData.Instance.Save();
-
-            Debug.Log("Load level");
         }
 
         /// <summary>
@@ -168,7 +219,8 @@ namespace RabbitLabirint
         public void LoadNextLevel()
         {
             //Level nextLevel = levelList.Find(item => item.levelName == currentLevel.levelName)
-            Level nextLevel = FindNextLevel();
+            Level nextLevel = FindLevelByName(PlayerData.Instance.currentLevel);
+
             if (nextLevel == null)
             {
                 Debug.Log("The last level was finished! There is not a new next level. Go to Loadout state!");
@@ -199,16 +251,27 @@ namespace RabbitLabirint
         /// </summary>
         private void FinishLevel()
         {
-            currentLevel.currentResult = GetResult();
-            SaveLevel(currentLevel);
-            GameObject btnGO = levelBox.Find(currentLevel.levelName).gameObject;
-            ChangeButtonUIResult(btnGO, currentLevel.currentResult);
+            Level.ResultPassing oldResult = currentLevel.currentResult;
+            Level.ResultPassing newResult = GetResult();
 
-            Level nextLevel = FindNextLevel(); // TODO: need refactoring (without save next level)
+            if (oldResult < newResult) // the newest result is better than old
+            {
+                currentLevel.currentResult = newResult;
+                GameObject btnGO = levelBox.Find(currentLevel.levelName).gameObject;
+                ChangeLevelButton(btnGO, currentLevel.currentResult);
+            }
+
+            SaveLevel(currentLevel);
+
+            Level nextLevel = FindNextLevel(currentLevel);
             if (nextLevel != null)
             {
-                nextLevel = UnlockLevel(nextLevel);
-                SaveLevel(nextLevel);
+                if (nextLevel.currentState == Level.LevelState.Locked)
+                {
+                    UnlockLevel(nextLevel);
+                    UnlockButton(nextLevel);
+                }
+
                 PlayerData.Instance.currentLevel = nextLevel.levelName;
                 PlayerData.Instance.Save();
             } else
@@ -227,38 +290,60 @@ namespace RabbitLabirint
             level.currentState = Level.LevelState.Unlocked;
             level.currentResult = Level.ResultPassing.NotPassed;
 
-            SaveLevel(level);
-
-            UnlockButton(level);
-
             return level;
+        }
+
+        /// <summary>
+        /// Set current level
+        /// </summary>
+        public void SetCurrentLevel()
+        {
+            Dictionary<string, int> savedLevels = PlayerData.Instance.levels;
+
+            // set current level
+            if (savedLevels.Count == 1)
+            {
+                if (savedLevels[savedLevels.Keys.First()] == (int)Level.ResultPassing.NotPassed)
+                {
+                    currentLevel = FindLevelByName(PlayerData.Instance.currentLevel);
+                }
+                else
+                {
+                    currentLevel = FindNextLevel(PlayerData.Instance.currentLevel);
+                }
+            }
+            else if (savedLevels.Count == levelList.Count)
+            {
+                currentLevel = FindLevelByName(PlayerData.Instance.currentLevel);
+            }
+            else
+            {
+                currentLevel = FindLevelByName(PlayerData.Instance.currentLevel);
+            }
+
         }
 
         #region UI
         /// <summary>
-        /// Add UI buttons of levels (possible game levels plus player's saved levels)
+        /// Add UI buttons of levels
         /// </summary>
-        private void FillList()
+        public void DrawLevelList()
         {
-            List<Level> playerLevelList = new List<Level>();
-
-            Dictionary<string, int> savedLevels = PlayerData.Instance.levels;
-
-            foreach (Level lvl in levelList)
-            {
-                if (savedLevels.ContainsKey(lvl.levelName))
-                {
-                    int savedResult = savedLevels[lvl.levelName];
-                    lvl.currentState = Level.LevelState.Unlocked;
-                    lvl.currentResult = (Level.ResultPassing)savedResult;
-                }
-
-                playerLevelList.Add(lvl);
-            }
-
+            // draw level UI buttons
             foreach (Level level in playerLevelList)
             {
                 DrawButton(level);
+            }
+        }
+
+        /// <summary>
+        /// Destroy all level ui button with their game objects
+        /// </summary>
+        public void ClearLevelList()
+        {
+            foreach (Transform child in levelBox.transform)
+            {
+                Destroy(child.gameObject);
             }
         }
 
@@ -290,11 +375,13 @@ namespace RabbitLabirint
         /// <param name="level"></param>
         private void DrawButton(Level level)
         {
-            GameObject newButtonGO = Instantiate(levelButton, levelBox.transform, false) as GameObject;
+            GameObject newButtonGO = Instantiate(levelButtonPrefab, levelBox.transform, false) as GameObject;
             newButtonGO.name = level.levelName;
+
             Text btnText = newButtonGO.GetComponentInChildren<Text>();
-            Button newButton = newButtonGO.GetComponent<Button>();
-            btnText.text = level.levelName + " - " + level.currentState + " - " + level.currentResult;
+            btnText.text = level.levelName;
+
+            Button newButton = newButtonGO.GetComponent<Button>();            
 
             switch (level.currentState)
             {
@@ -304,9 +391,12 @@ namespace RabbitLabirint
                     break;
                 case Level.LevelState.Unlocked:
                     newButton.onClick.AddListener(() => LoadSelectedLevel(level));
+                    newButton.onClick.AddListener(() => SoundManager.Instance.PlayUIButtonSound());
                     //Debug.Log("Unlocked");
                     break;
             }
+
+            LevelButton levelButton = newButtonGO.GetComponent<LevelButton>();
 
             switch (level.currentResult)
             {
@@ -314,12 +404,15 @@ namespace RabbitLabirint
                     //Debug.Log("NotPassed");
                     break;
                 case Level.ResultPassing.Low:
+                    levelButton.SetLevelStars(1);
                     //Debug.Log("Low");
                     break;
                 case Level.ResultPassing.Middle:
+                    levelButton.SetLevelStars(2);
                     //Debug.Log("Middle");
                     break;
                 case Level.ResultPassing.High:
+                    levelButton.SetLevelStars(3);
                     //Debug.Log("High");
                     break;
             }
@@ -337,31 +430,48 @@ namespace RabbitLabirint
             btn.interactable = true;
             btn.onClick.AddListener(() => LoadSelectedLevel(level));
 
-            ChangeButtonUIResult(btnGO, level.currentResult);
+            ChangeLevelButton(btnGO, level.currentResult);
         }
 
         /// <summary>
-        /// Change result of level (number of stars) //TODO: add stars for button
+        /// Change result of level (number of stars)
         /// </summary>
         /// <param name="btnGO"></param>
         /// <param name="resultPassing"></param>
-        private void ChangeButtonUIResult(GameObject btnGO, Level.ResultPassing resultPassing)
+        private void ChangeLevelButton(GameObject btnGO, Level.ResultPassing resultPassing)
         {
-            Text btnText = btnGO.GetComponentInChildren<Text>();
-            btnText.text = resultPassing.ToString();
+            //Text btnText = btnGO.GetComponentInChildren<Text>();
+            //btnText.text = resultPassing.ToString();
+
+            LevelButton levelButton = btnGO.GetComponent<LevelButton>();
+
+            switch (resultPassing)
+            {
+                case Level.ResultPassing.Low:
+                    levelButton.SetLevelStars(1);
+                    //Debug.Log("Low");
+                    break;
+                case Level.ResultPassing.Middle:
+                    levelButton.SetLevelStars(2);
+                    //Debug.Log("Middle");
+                    break;
+                case Level.ResultPassing.High:
+                    levelButton.SetLevelStars(3);
+                    //Debug.Log("High");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Set level title
+        /// </summary>
+        public void SetLevelTitle()
+        {
+            levelTitle.text = currentLevel.levelName;
         }
         #endregion
 
         #region Helpers
-        /// <summary>
-        /// Set current saved level
-        /// </summary>
-        public void SetCurrentLevelFromSave()
-        {
-            string savedCurrentLevelName = PlayerData.Instance.currentLevel;
-            currentLevel = FindLevelByName(savedCurrentLevelName);
-        }
-
         /// <summary>
         /// Searches for a level by name
         /// </summary>
@@ -374,30 +484,51 @@ namespace RabbitLabirint
                 return null;
             }
 
-            Level level = levelList.Find(item => item.levelName == levelName);
+            Level level = playerLevelList.Find(item => item.levelName == levelName);
             return level;
         }
 
         /// <summary>
-        /// Searches for the next level after the current one
+        /// Searches for the next level after the level (parameter)
         /// </summary>
-        /// <returns></returns>
-        private Level FindNextLevel()
+        /// <param name="level"></param>
+        /// <returns>Next level</returns>
+        private Level FindNextLevel(Level level)
         {
-            int currentLevelIndex = levelList.IndexOf(currentLevel);
-            if (currentLevelIndex == (levelList.Count - 1)) // reach the last level
+            int levelIndex = playerLevelList.IndexOf(level);
+            if (levelIndex == (playerLevelList.Count - 1)) // reach the last level
             {
                 return null;
             }
             else
             {
-                Level nextLevel = levelList[currentLevelIndex + 1];
+                Level nextLevel = playerLevelList[levelIndex + 1];
                 return nextLevel;
             }
         }
 
         /// <summary>
-        /// check the player's parameters and determine the result by them
+        /// Searches for the next level by name of received level
+        /// </summary>
+        /// <param name="levelName">Name of received level</param>
+        /// <returns>Next level</returns>
+        private Level FindNextLevel(string levelName)
+        {
+            Level level = FindLevelByName(levelName);
+            int levelIndex = playerLevelList.IndexOf(level);
+            if (levelIndex == (playerLevelList.Count - 1)) // reach the last level
+            {
+                return null;
+            }
+            else
+            {
+                Level nextLevel = playerLevelList[levelIndex + 1];
+                return nextLevel;
+            }
+        }
+
+        /// <summary>
+        /// Check the player's parameters and determine the current result by them
         /// </summary>
         /// <returns></returns>
         private Level.ResultPassing GetResult()

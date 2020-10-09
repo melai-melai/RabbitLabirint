@@ -16,7 +16,7 @@ namespace RabbitLabirint
         {
             Debug.Log("Enter Player Attacked State");
             // attacked animation
-            GameManager.Instance.SwitchState("GameOver");
+            PlayerController.Instance.TriggerAttacked();
         }
 
         /// <summary>

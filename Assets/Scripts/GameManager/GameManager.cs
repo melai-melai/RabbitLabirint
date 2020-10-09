@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace RabbitLabirint
 {
@@ -9,11 +10,12 @@ namespace RabbitLabirint
     /// </summary>
     public class GameManager : MonoSingleton<GameManager>
     {
+        [SerializeField]
+        private Text versionText;
+
         public State[] states;
         protected List<State> stateStack = new List<State>();
         protected Dictionary<string, State> stateDictionary = new Dictionary<string, State>();
-
-        private AudioSource audioSource;
 
         public State topState
         {
@@ -28,10 +30,6 @@ namespace RabbitLabirint
         public override void Init()
         {
             base.Init();
-
-            
-            audioSource = GetComponent<AudioSource>();
-            //PlayNewBackgroundMusic(menuClip);
 
             // We build a dictionnary from state for easy switching using their name.
             stateDictionary.Clear();
@@ -57,9 +55,9 @@ namespace RabbitLabirint
             PlayerData.Create();
         }
 
-        private void OnDisable()
+        private void Start()
         {
-            
+            versionText.text = "v. " + Application.version;
         }
 
         private void Update()
@@ -151,16 +149,6 @@ namespace RabbitLabirint
         #endregion
 
         #region Helpers
-        /// <summary>
-        /// Set new background audio clip and play it
-        /// </summary>
-        /// <param name="newClip"></param>
-        public void PlayNewBackgroundMusic(AudioClip newClip)
-        {
-            audioSource.clip = newClip;
-            audioSource.Play();
-        }
-
         /// <summary>
         /// Change active screen
         /// </summary>

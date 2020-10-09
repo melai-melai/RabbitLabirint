@@ -12,19 +12,12 @@ namespace RabbitLabirint
         [SerializeField]
         private GameObject target;
         private Tilemap tilemap;
-        private Vector3 targetCoordinate;
-
+     
         private Dictionary<string, Vector3> directions = new Dictionary<string, Vector3>();
 
         private List<Vector3> pathPoints = new List<Vector3>();
 
-        /*public Vector3 Target
-        {
-            get
-            {
-                return GetCoordinateTarget();
-            }
-        }*/
+        public Vector2 TargetDirection { get; private set; }
 
         // Start is called before the first frame update
         void Start()
@@ -85,7 +78,7 @@ namespace RabbitLabirint
         public Vector3 GetCoordinateTarget(Vector3 inputCoordinate)
         {
             Vector3 playerTileCoordinate = PlayerController.Instance.Coordinate;
-            Vector3 targetCoordinate = playerTileCoordinate; // TODO: refactoring
+            Vector3 targetCoordinate = playerTileCoordinate;
 
             if (inputCoordinate == null)
             {
@@ -107,9 +100,8 @@ namespace RabbitLabirint
                 }
             }
 
-            //Debug.Log("Mouse coord: " + mouseTileCoordinate);
-            //Debug.Log("Target coord: " + targetCoordinate);
-            //Debug.Log("Min distance: " + minDistance);
+            TargetDirection = new Vector2(targetCoordinate.x - playerTileCoordinate.x, targetCoordinate.y - playerTileCoordinate.y).normalized;
+
             return targetCoordinate;
         }
 
@@ -125,8 +117,8 @@ namespace RabbitLabirint
             foreach (string key in directions.Keys.ToList())
             {
                 directions[key] = BuildPathTowards(key, directions[key]);
-                //Debug.Log("Конечная точка направления " + key + " равна " + directions[key]);
-            }            
+                //Debug.Log("End point of direction " + key + " is " + directions[key]);
+            }
         }
 
         /// <summary>
@@ -204,6 +196,5 @@ namespace RabbitLabirint
 
             pathPoints.Clear();
         }
-
     }
 }

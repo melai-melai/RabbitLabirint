@@ -27,7 +27,7 @@ namespace RabbitLabirint
         public RectTransform pauseMenu;
         public Button pauseButton;
         public RectTransform totalInfoPopup;
-        public TMP_Text totalInfoText;
+        
 
         protected bool isFinished;
 
@@ -54,6 +54,7 @@ namespace RabbitLabirint
             pauseButton.gameObject.SetActive(false);
 
             LevelManager.Instance.DeleteLevel();
+            UIStar.Instance.CleanResultStars();
 
             PlayerController.Instance.SwitchState("Empty");
 
@@ -113,8 +114,10 @@ namespace RabbitLabirint
 
             isFinished = false;
 
-            // load current level or selected level
+            SoundManager.Instance.PlayNewBackgroundMusic(gameMusic);
+
             LevelManager.Instance.LoadLevel();
+            LevelManager.Instance.SetLevelTitle();
 
             UIStep.Instance.SetValue(PlayerController.Instance.Steps);
             UICarrot.Instance.SetValue(0);
@@ -189,7 +192,8 @@ namespace RabbitLabirint
         private void OpenTotalInfoPopup()
         {
             isFinished = true;
-            totalInfoText.text = GetResultStars() + " stars";
+            int stars = (int)LevelManager.Instance.CurLevelResult;
+            UIStar.Instance.SetResultStars(stars);
             totalInfoPopup.gameObject.SetActive(true);
         }
 
@@ -220,23 +224,7 @@ namespace RabbitLabirint
         }
 
         #region Helpers
-        /// <summary>
-        /// Get the result of the level depending on the status of passing the level
-        /// </summary>
-        /// <returns>Stars earned per level</returns>
-        private int GetResultStars()
-        {
-            switch (LevelManager.Instance.CurLevelResult)
-            {
-                case LevelManager.Level.ResultPassing.High:
-                    return 3;
-                case LevelManager.Level.ResultPassing.Middle:
-                    return 2;
-                case LevelManager.Level.ResultPassing.Low:
-                    return 1;
-                default: return 0;
-            }           
-        }
+        
         #endregion
     }
 }

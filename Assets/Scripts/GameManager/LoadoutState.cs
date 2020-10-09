@@ -29,8 +29,7 @@ namespace RabbitLabirint
         public override void Enter(State from)
         {
             inventoryCanvas.gameObject.SetActive(true);
-
-            // set menu music (play)
+            SoundManager.Instance.PlayNewBackgroundMusic(menuMusic);
 
             playButton.interactable = false;
             playButton.GetComponentInChildren<TextMeshProUGUI>().text = "Loading...";
@@ -72,13 +71,15 @@ namespace RabbitLabirint
         /// </summary>
         public void StartGame()
         {
-            LevelManager.Instance.SetCurrentLevelFromSave(); // TODO: needs refactoring
             gameManager.SwitchState("Game");
         }
 
         public void Refresh()
         {
-            // refresh levels buttons
+            LevelManager.Instance.ClearLevelList();
+            LevelManager.Instance.FormPlayerList();
+            LevelManager.Instance.DrawLevelList();
+            LevelManager.Instance.SetCurrentLevel();
         }
     }
 }

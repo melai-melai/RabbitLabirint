@@ -14,11 +14,34 @@ namespace RabbitLabirint
         [HideInInspector]
         public GameObject currentPlayerGO;
 
+        [Header("Particles")]
+        public ParticleSystem jumpEffect;
+        public ParticleSystem stepEffect;
+        public ParticleSystem shieldEffect;
+        public ParticleSystem carrotEffect;
+
+        private AudioSource audioSource;
+        public enum PlayerSound
+        {
+            Run,
+            Jump
+        }
+        [Header("Sound")]
+        public AudioClip runClip;
+        public AudioClip jumpClip;
+        public AudioClip jumpClip2;
+        public AudioClip carrotClip;
+        public AudioClip shieldClip;
+
+        [HideInInspector]
+        public Animator animator;
         private Camera cam;
         private Grid grid;
         private Tilemap tilemap;
-
+        [HideInInspector]
         public bool OnFinish;
+        private bool hasShield;
+        private float shieldTime = -1.0f;
 
         private int layerMask = 1 << 8; // Bit shift the index of the layer (8 - Tilemap) to get a bit mask
 
@@ -52,7 +75,6 @@ namespace RabbitLabirint
         private const string nameFinishingState = "Finishing";
         private const string nameFinishedState = "Finished";
         
-
         protected PlayerBaseState[] states = new PlayerBaseState[] { 
             new PlayerEmptyState(nameEmptyState),
             new PlayerIdleState(nameIdleState),
@@ -98,6 +120,8 @@ namespace RabbitLabirint
             stateStack.Clear();
 
             PushState(states[0].GetName());
+
+            audioSource = gameObject.GetComponent<AudioSource>();
         }
 
         private void Update()
@@ -105,6 +129,15 @@ namespace RabbitLabirint
             if (stateStack.Count > 0)
             {
                 stateStack[stateStack.Count - 1].Tick();
+            }
+
+            if (shieldTime > 0)
+            {
+                shieldTime -= Time.deltaTime;
+                if (shieldTime < 0)
+                {
+                    RemoveShield();
+                }
             }
         }
 
@@ -118,50 +151,55 @@ namespace RabbitLabirint
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.gameObject.name == "RabbitHole")
+            if (collision.gameObject.tag == "Hole")
             {
                 OnFinish = true;
             }
             else if (collision.tag == "Enemy" && topState.GetName() == nameMovingState)
             {
-                Debug.Log("You are died!");
-                SwitchState("Attacked");
+                EnemyController enemy = collision.gameObject.GetComponent<EnemyController>();
+
+                if (hasShield)
+                {
+                    RemoveShield();
+                    if (enemy != null)
+                    {
+                        StartCoroutine(enemy.HideAway());
+                    }
+                }
+                else
+                {
+                    if (enemy != null)
+                    {
+                        StartCoroutine(enemy.Attack());
+                    }
+                }                                
             }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
-            if (collision.gameObject.name == "RabbitHole")
+            if (collision.gameObject.tag == "Hole")
             {
+                Debug.Log("Collision HOLE END");
                 OnFinish = false;
             }
         }
 
-
-        //private void OnGUI()
-        //{
-        //    Event currentEvent = Event.current;
-        //    Vector2 mousePos = new Vector2();
-        //    Vector2 point = new Vector2();
-
-        //    // compute where the mouse is in world space
-        //    mousePos.x = currentEvent.mousePosition.x;
-        //    mousePos.y = cam.pixelHeight - currentEvent.mousePosition.y;
-        //    point = cam.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0.0f));
-
-        //    if (Input.GetMouseButtonDown(0))
-        //    {
-        //        // set the target to the mouse click location
-        //        target = point;
-        //    }
-        //}
-
+        /// <summary>
+        /// Change player's points
+        /// </summary>
+        /// <param name="amount"></param>
         public void ChangePoints(int amount)
         {
             Points += amount;
             UICarrot.Instance.SetValue(Points);
         }
 
+        /// <summary>
+        /// Change player's steps
+        /// </summary>
+        /// <param name="amount"></param>
         public void ChangeSteps(int amount)
         {
             Steps -= amount;
@@ -192,6 +230,8 @@ namespace RabbitLabirint
 
             DestroyPlayerGO();
             CreatePlayerGO();
+
+            animator = currentPlayerGO.GetComponent<Animator>();
         }
 
         /// <summary>
@@ -209,24 +249,64 @@ namespace RabbitLabirint
             grid = null;
             tilemap = null;
             RouteBuilder = null;
+            animator = null;
 
             DestroyPlayerGO();
         }
 
+        /// <summary>
+        /// Create player's game object (game object with player's sprite)
+        /// </summary>
         public void CreatePlayerGO()
         {
             currentPlayerGO = Instantiate(playerPrefab, gameObject.transform, false) as GameObject;
+            stepEffect.Play();
         }
 
+        /// <summary>
+        /// Destroy player's game object (game object with player's sprite)
+        /// </summary>
         private void DestroyPlayerGO()
         {
             if (currentPlayerGO != null)
             {
                 Destroy(currentPlayerGO);
-                Debug.Log("Reset player " + currentPlayerGO.ToString());
             }
+            stepEffect.Stop();
         }
 
+        /// <summary>
+        /// Set player's shield
+        /// </summary>
+        /// <param name="time">Duration</param>
+        public void SetShield(float time)
+        {
+            hasShield = true;
+            shieldTime = time;
+            shieldEffect.Play();
+            audioSource.PlayOneShot(shieldClip);
+        }
+
+        /// <summary>
+        /// Remove player's shield
+        /// </summary>
+        public void RemoveShield()
+        {
+            hasShield = false;
+            shieldTime = -1.0f;
+            shieldEffect.Stop();
+        }
+
+        /// <summary>
+        /// Eat carrot
+        /// </summary>
+        /// <param name="point"></param>
+        public void EatCarrot(int point)
+        {
+            carrotEffect.Play();
+            audioSource.PlayOneShot(carrotClip);
+            ChangePoints(point);
+        }
 
         #region State management
         /// <summary>
@@ -308,6 +388,42 @@ namespace RabbitLabirint
         }
         #endregion
 
+        #region Animation
+        /// <summary>
+        /// Set moving animation depending on the direction of movement
+        /// </summary>
+        /// <param name="moving"></param>
+        public void SetMovingAnimation(bool moving)
+        {
+            Vector2 direction = new Vector2(0.0f, 0.0f);
+
+            if (moving)
+            {
+                direction = RouteBuilder.TargetDirection;
+            }
+
+            animator.SetFloat("Move X", direction.x);
+            animator.SetFloat("Move Y", direction.y);
+        }
+
+        /// <summary>
+        /// Trigger finish jump animation
+        /// </summary>
+        private void TriggerFinishJump()
+        {
+            animator.SetTrigger("Jump_Hole");
+        }
+
+        /// <summary>
+        /// Trigger attacked animation
+        /// </summary>
+        public void TriggerAttacked()
+        {
+            stepEffect.Stop();
+            animator.SetTrigger("Attacked");
+        }
+        #endregion
+
         #region Helpers
         /// <summary>
         /// Check hit on tilemap // TODO: need refactoring of raycast
@@ -334,14 +450,69 @@ namespace RabbitLabirint
         /// <summary>
         /// Call at the finish // TODO: needs refactoring
         /// </summary>
-        public static void CallOnFinished()
+        public void CallOnFinished()
         {
-            if (onHappenedFinish != null)
-            {
-                onHappenedFinish();
-            }
+            RemoveShield();
+            stepEffect.Stop();
+            TriggerFinishJump();
+            jumpEffect.Play();
+            PlaySound(PlayerSound.Jump);
+            StartCoroutine("WaitUntilFinish");            
+        }
+
+        /// <summary>
+        /// Wait until finish of level and call finish event
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerator WaitUntilFinish()
+        {
+            yield return new WaitForSecondsRealtime(3.0f);
+            onHappenedFinish?.Invoke();
         }
         #endregion
+
+        #region Sounds
+        /// <summary>
+        /// Play sound by enum PlayerSound
+        /// </summary>
+        /// <param name="playerSound"></param>
+        public void PlaySound(PlayerSound playerSound)
+        {
+            switch (playerSound)
+            {
+                case PlayerSound.Run:
+                    audioSource.loop = true;
+                    audioSource.clip = runClip;
+                    audioSource.Play();
+                    break;
+                case PlayerSound.Jump:
+                    audioSource.loop = false;
+                    audioSource.clip = jumpClip;
+                    audioSource.PlayDelayed(1.0f);
+                    StartCoroutine("WaitUntilJumpEnd");
+                    break;
+            }
+            
+        }
+
+        /// <summary>
+        /// Stop current player's sound
+        /// </summary>
+        public void StopSound()
+        {
+            audioSource.Stop();
+        }
+
+        /// <summary>
+        /// Wait and play ending jump audio clip
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator WaitUntilJumpEnd()
+        {
+            yield return new WaitForSeconds(2.2f);
+            audioSource.PlayOneShot(jumpClip2);
+        }
+        #endregion        
     }
 
 }
