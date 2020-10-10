@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - HighlightTilemap
+  - Level
+  - PlayerStartPosition
+  - Tilemap
+  - Grid
+  - Enemy
+  - Hole
   layers:
   - Default
   - TransparentFX
@@ -13,7 +20,7 @@ TagManager:
   - UI
   - 
   - 
-  - 
+  - Tilemap
   - 
   - 
   - 
