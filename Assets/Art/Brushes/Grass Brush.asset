@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Grass Brush
   m_EditorClassIdentifier: 
   m_Cells:
-  - m_Tile: {fileID: 0}
+  - m_Tile: {fileID: 11400000, guid: c4bc75b34b2027b49bf662374c14499d, type: 2}
     m_Matrix:
       e00: 1
       e01: 0
